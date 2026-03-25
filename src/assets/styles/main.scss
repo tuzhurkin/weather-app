@@ -1,0 +1,95 @@
+@use 'vars' as *;
+@use 'mixins' as *;
+// @use 'fonts';
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  font-family: $main-font;
+  font-style: normal;
+  font-weight: 500;
+  color: $color-grey-text;
+  background-color: $color-white;
+  font-size: 20px;
+  line-height: 150%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: $md) {
+    font-size: 18px;
+  }
+}
+
+img {
+  max-width: 100%;
+}
+
+input,
+button,
+textarea {
+  -webkit-appearance: none;
+}
+
+input {
+  // hide arrows for number input
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  &[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+}
+
+ul,
+ol {
+  list-style-type: none;
+}
+
+ul,
+ol,
+li {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  transition: color 0.3s;
+  color: $color-blue-dark;
+  &:not(.current-route) {
+    @include hover {
+      color: $color-white;
+    }
+  }
+  &.current-route {
+    cursor: default;
+  }
+  &.underline {
+    text-decoration: underline;
+  }
+}
+
+.router-link-active {
+  cursor: default;
+}
