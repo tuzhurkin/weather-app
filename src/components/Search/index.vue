@@ -1,7 +1,7 @@
 <template>
   <div class="search-autocomplete">
     <BaseSearch v-bind="searchData" v-model="query" @search="onSearch" />
-    <div v-show="results.length" class="results-box">
+    <div v-show="isResultsVisible" v-on-click-outside="onClickOutside" class="results-box">
       <ul v-if="!loading" class="results">
         <li v-for="result in results" :key="result.id" @click="selectCity(result)" class="result">
           <span class="name">{{ result.name }}, </span>
@@ -17,8 +17,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { API_KEY } from '@/constants/config';
+import { ref, computed, watch } from 'vue';
+import { vOnClickOutside } from '@vueuse/components';
 import BaseSearch from '@/components/Base/Search.vue';
 import BasePreloader from '@/components/Base/Preloader.vue';
 import { useCitySearch } from '@/composables/useCitySearch';
@@ -27,14 +27,9 @@ defineOptions({
   name: 'SearchAutocomplete',
 });
 
-const { query, results, loading } = useCitySearch(API_KEY);
+const { query, results, loading } = useCitySearch();
 
 const emit = defineEmits(['select']);
-
-function selectCity(city) {
-  const cityName = city.name;
-  emit('select', cityName);
-}
 
 const searchData = computed(() => ({
   value: query.value,
@@ -45,9 +40,26 @@ const searchData = computed(() => ({
   placeholder: 'Enter city name',
   disabled: false,
 }));
+const open = ref(false);
+const isResultsVisible = computed(() => results.value.length > 0 && open.value);
+
+watch(results, value => {
+  open.value = Boolean(value.length);
+});
+
+const selectCity = city => {
+  const cityName = city.name;
+  emit('select', cityName);
+  open.value = false;
+};
 
 const onSearch = value => {
-  console.log(value);
+  emit('select', value);
+  open.value = false;
+};
+
+const onClickOutside = () => {
+  if (open.value) open.value = false;
 };
 </script>
 
@@ -62,8 +74,7 @@ const onSearch = value => {
     z-index: 3;
     overflow: hidden;
     width: 100%;
-    background-color: $color-white;
-    border: 1px solid $color-grey-500;
+    background-color: $color-grey-700;
     border-radius: 10px;
 
     .results {
@@ -71,15 +82,15 @@ const onSearch = value => {
         padding: 8px 16px;
         font-weight: 400;
         font-size: 16px;
-        line-height: 120%;
+        line-height: 150%;
         letter-spacing: -0.28px;
-        color: $color-grey-text;
+        color: $color-grey-200;
         transition: color $transition ease;
         cursor: pointer;
         @include noTap;
 
         @include hover {
-          background-color: $color-grey-100;
+          background-color: $color-grey-600;
         }
 
         &:first-child {

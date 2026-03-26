@@ -92,27 +92,17 @@ watch(
 
   &.focused {
     :deep(input) {
-      border-color: $color-black;
+      border-color: $color-yellow-hover;
     }
-
-    // :deep(.btn) {
-    //   border-color: $color-black;
-    //   .icon {
-    //     path[stroke] {
-    //       stroke: $color-black;
-    //     }
-    //     path[fill] {
-    //       fill: $color-black;
-    //     }
-    //   }
-    // }
   }
 
   :deep(input) {
     height: 56px;
     padding: 8px 24px;
-    border: 1px solid $color-grey-500;
     border-radius: 50px;
+    color: $color-grey-200;
+    border: 2px solid $color-yellow;
+    background-color: $color-grey-800;
     transition: border-color $transition ease;
   }
 
@@ -120,15 +110,15 @@ watch(
     width: 56px;
     height: 56px;
     border-radius: 50px;
-    border-color: $color-black;
+    border-color: $color-yellow;
     transition: border-color $transition ease;
 
     .icon {
       path[stroke] {
-        stroke: $color-black;
+        stroke: $color-yellow;
       }
       path[fill] {
-        fill: $color-black;
+        fill: $color-yellow;
       }
     }
   }

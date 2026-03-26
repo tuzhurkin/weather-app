@@ -1,0 +1,25 @@
+svg:
+pin
+delete
+bookmark
+add
+search
+
+01d - clear-day
+01n - clear-night
+02d - partly-cloudy-day
+02n - partly-cloudy-night
+03d - cloudy
+03n - cloudy
+04d - overcast-day
+04n - overcast-night
+09d - partly-cloudy-day-drizzle
+09n - partly-cloudy-night-drizzle
+10d - partly-cloudy-day-rain
+10n - partly-cloudy-night-rain
+11d - thunderstorms-day
+11n - thunderstorms-night
+13d - snow / partly-cloudy-day-snow
+13n - snow / partly-cloudy-night-snow
+50d - mist / haze-day / fog-day
+50n - mist / haze-night / fog-night

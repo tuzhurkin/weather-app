@@ -1,7 +1,7 @@
 <template>
   <div class="preloader" :class="{ absolute, fixed }">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-      <circle fill="#89C0FF" stroke="#89C0FF" stroke-width="15" r="15" cx="40" cy="65">
+      <circle :fill="color" :stroke="color" stroke-width="15" r="15" cx="40" cy="65">
         <animate
           attributeName="cy"
           calcMode="spline"
@@ -12,7 +12,7 @@
           begin="-.4"
         ></animate>
       </circle>
-      <circle fill="#89C0FF" stroke="#89C0FF" stroke-width="15" r="15" cx="100" cy="65">
+      <circle :fill="color" :stroke="color" stroke-width="15" r="15" cx="100" cy="65">
         <animate
           attributeName="cy"
           calcMode="spline"
@@ -23,7 +23,7 @@
           begin="-.2"
         ></animate>
       </circle>
-      <circle fill="#89C0FF" stroke="#89C0FF" stroke-width="15" r="15" cx="160" cy="65">
+      <circle :fill="color" :stroke="color" stroke-width="15" r="15" cx="160" cy="65">
         <animate
           attributeName="cy"
           calcMode="spline"
@@ -110,6 +110,8 @@ defineProps({
     default: false,
   },
 });
+
+const color = '#fcad17';
 </script>
 
 <style scoped lang="scss">

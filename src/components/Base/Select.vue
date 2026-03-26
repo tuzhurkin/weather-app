@@ -202,7 +202,7 @@ const selectOption = option => {
       font-size: 16px;
       line-height: 120%;
       letter-spacing: -0.28px;
-      color: $color-grey-text;
+      color: $color-grey-200;
       transition: color $transition ease;
       @include textOverflow;
     }
@@ -252,7 +252,7 @@ const selectOption = option => {
         font-size: 16px;
         line-height: 150%;
         letter-spacing: -0.32px;
-        color: $color-grey-text;
+        color: $color-grey-200;
         transition: color $transition ease;
         cursor: pointer;
         @include noTap;

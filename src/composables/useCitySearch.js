@@ -1,8 +1,8 @@
 import { ref, watch } from 'vue';
+import { GEO_API_URL, API_KEY } from '@/constants/config';
 
-export function useCitySearch(apiKey) {
+export const useCitySearch = () => {
   const QUERY_MIN_LENGTH = 2;
-  const API_URL_CITIES = 'https://api.openweathermap.org/geo/1.0/direct';
   const REQUEST_LIMIT = 5;
   const REQUEST_DELAY = 300;
 
@@ -22,10 +22,9 @@ export function useCitySearch(apiKey) {
     try {
       await sleep(REQUEST_DELAY);
 
-      const res = await fetch(
-        `${API_URL_CITIES}?q=${query}&limit=${REQUEST_LIMIT}&appid=${apiKey}`,
-        { signal: controller.signal }
-      );
+      const res = await fetch(`${GEO_API_URL}?q=${query}&limit=${REQUEST_LIMIT}&appid=${API_KEY}`, {
+        signal: controller.signal,
+      });
       const data = await res.json();
       results.value = data;
       cache.set(query, data);
@@ -67,4 +66,4 @@ export function useCitySearch(apiKey) {
     loading,
     error,
   };
-}
+};

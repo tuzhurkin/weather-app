@@ -10,8 +10,8 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { API_KEY } from '@/constants/config';
+import { ref, watch } from 'vue';
+import { API_KEY, API_URL } from '@/constants/config';
 // import ProjectSearch from '@/components/Project/Search.vue';
 import Search from '@/components/Search/index.vue';
 import ProjectCards from '@/components/Project/Cards.vue';
@@ -20,19 +20,8 @@ defineOptions({
   name: 'Project',
 });
 
-const API_URL = 'https://api.openweathermap.org/data/2.5/weather';
-const API_URL_CITIES = 'https://api.openweathermap.org/geo/1.0/direct';
 const citySearchValue = ref('');
 const loading = ref(false);
-
-const fetchCitiesData = async () => {
-  if (!citySearchValue.value) return;
-
-  // const response = await fetch(`${API_URL_CITIES}?q=${citySearchValue.value}&limit=5&appid=${API_KEY}`);
-  const response = await fetch(`${API_URL_CITIES}?q=be&limit=5&appid=${API_KEY}`);
-  const data = await response.json();
-  console.log('fetchCitiesData', data);
-};
 
 const fetchWeatherData = async () => {
   if (!citySearchValue.value) return;
@@ -48,6 +37,7 @@ const fetchWeatherData = async () => {
     if (!success) throw new Error(data.message);
 
     cardData.value = data;
+    cards.value.push(buildCard(cardData.value));
     console.log('fetchWeatherData', data);
   } catch (error) {
     console.error(error);
@@ -57,23 +47,24 @@ const fetchWeatherData = async () => {
 };
 
 const cardData = ref({});
-const activeCard = ref([]);
+// const activeCard = ref([]);
 const cards = ref([]);
 
-const buildCard = () => {
-  const card = {
-    id: cardData.value.id,
-    city: cardData.value.name,
-    country: cardData.value.sys.country,
-    temperature: cardData.value.main.temp,
-    feels_like: cardData.value.main.feels_like,
-    wind_speed: cardData.value.wind.speed,
-    humidity: cardData.value.main.humidity,
-    title: cardData.value.weather[0].main,
-    description: cardData.value.weather[0].description,
-    icon: cardData.value.weather[0].icon,
+const buildCard = card => {
+  return {
+    id: card.id,
+    city: card.name,
+    country: card.sys.country,
+    temp: card.main.temp,
+    temp_min: card.main.temp_min,
+    temp_max: card.main.temp_max,
+    feels_like: card.main.feels_like,
+    wind: card.wind.speed,
+    humidity: card.main.humidity,
+    title: card.weather[0].main,
+    description: card.weather[0].description,
+    icon: card.weather[0].icon,
   };
-  activeCard.value = card;
 };
 
 const onSearch = value => {
@@ -84,11 +75,6 @@ const onSearch = value => {
 watch(citySearchValue, async value => {
   console.log('watch citySearchValue', value);
   await fetchWeatherData();
-});
-
-onMounted(async () => {
-  // fetchWeatherData();
-  // await fetchCitiesData();
 });
 </script>
 

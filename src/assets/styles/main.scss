@@ -10,8 +10,8 @@ html {
   font-family: $main-font;
   font-style: normal;
   font-weight: 500;
-  color: $color-grey-text;
-  background-color: $color-white;
+  color: $color-grey-200;
+  background-color: $color-grey-900;
   font-size: 20px;
   line-height: 150%;
   -webkit-text-size-adjust: 100%;
@@ -76,7 +76,7 @@ li {
 a {
   text-decoration: none;
   transition: color 0.3s;
-  color: $color-blue-dark;
+  color: $color-blue;
   &:not(.current-route) {
     @include hover {
       color: $color-white;
