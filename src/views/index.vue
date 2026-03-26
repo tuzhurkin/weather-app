@@ -1,10 +1,12 @@
 <template>
   <div class="default-page main-page">
-    <h1>Homepage</h1>
+    <Project />
   </div>
 </template>
 
 <script setup>
+import Project from '@/components/Project/index.vue';
+
 defineOptions({
   name: 'MainPage',
 });

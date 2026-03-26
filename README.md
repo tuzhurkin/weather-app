@@ -1,4 +1,4 @@
-# Vue 3 + Vite Data Table Project
+# Vue 3 + Vite Weather App Project
 
 ## Prerequisites
 

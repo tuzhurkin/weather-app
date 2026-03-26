@@ -1,0 +1,103 @@
+<template>
+  <div class="search-autocomplete">
+    <BaseSearch v-bind="searchData" v-model="query" @search="onSearch" />
+    <div v-show="results.length" class="results-box">
+      <ul v-if="!loading" class="results">
+        <li v-for="result in results" :key="result.id" @click="selectCity(result)" class="result">
+          <span class="name">{{ result.name }}, </span>
+          <span class="country">{{ result.country }} </span>
+          <span v-if="result.state" class="state"> ({{ result.state }})</span>
+        </li>
+      </ul>
+      <div v-if="loading" class="loading">
+        <BasePreloader />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue';
+import { API_KEY } from '@/constants/config';
+import BaseSearch from '@/components/Base/Search.vue';
+import BasePreloader from '@/components/Base/Preloader.vue';
+import { useCitySearch } from '@/composables/useCitySearch';
+
+defineOptions({
+  name: 'SearchAutocomplete',
+});
+
+const { query, results, loading } = useCitySearch(API_KEY);
+
+const emit = defineEmits(['select']);
+
+function selectCity(city) {
+  const cityName = city.name;
+  emit('select', cityName);
+}
+
+const searchData = computed(() => ({
+  value: query.value,
+  idx: 'search',
+  name: 'search',
+  type: 'text',
+  autocomplete: 'off',
+  placeholder: 'Enter city name',
+  disabled: false,
+}));
+
+const onSearch = value => {
+  console.log(value);
+};
+</script>
+
+<style scoped lang="scss">
+.search-autocomplete {
+  position: relative;
+
+  .results-box {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 3;
+    overflow: hidden;
+    width: 100%;
+    background-color: $color-white;
+    border: 1px solid $color-grey-500;
+    border-radius: 10px;
+
+    .results {
+      .result {
+        padding: 8px 16px;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 120%;
+        letter-spacing: -0.28px;
+        color: $color-grey-text;
+        transition: color $transition ease;
+        cursor: pointer;
+        @include noTap;
+
+        @include hover {
+          background-color: $color-grey-100;
+        }
+
+        &:first-child {
+          padding-top: 12px;
+        }
+
+        &:last-child {
+          padding-bottom: 12px;
+        }
+      }
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 16px;
+    }
+  }
+}
+</style>

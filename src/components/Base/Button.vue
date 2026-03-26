@@ -210,8 +210,7 @@ button,
     min-height: 36px;
     height: auto;
     border-radius: 6px;
-    border: 2px solid $color-grey-110;
-    background-color: $color-grey-100;
+    border: 1px solid $color-grey-110;
     transition:
       color $transition ease,
       background-color $transition ease,

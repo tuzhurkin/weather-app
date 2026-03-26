@@ -12,7 +12,7 @@
       @focus="focus"
       @blur="blur"
     />
-    <BaseButton type="texted" icon="search" :disabled="!modelValue" @click="onSearchButtonClick" />
+    <BaseButton type="icony" icon="search" :disabled="!modelValue" @click="onSearchButtonClick" />
   </label>
 </template>
 
@@ -87,32 +87,50 @@ watch(
 .search {
   display: flex;
   align-items: center;
-  height: 38px;
-  border-radius: 6px;
-  border: 1px solid $color-grey-500;
+  column-gap: 16px;
   transition: border-color $transition ease;
 
   &.focused {
-    border-color: $color-black;
-
-    :deep(.btn) {
+    :deep(input) {
       border-color: $color-black;
-      .icon {
-        path[stroke] {
-          stroke: $color-black;
-        }
-        path[fill] {
-          fill: $color-black;
-        }
-      }
     }
+
+    // :deep(.btn) {
+    //   border-color: $color-black;
+    //   .icon {
+    //     path[stroke] {
+    //       stroke: $color-black;
+    //     }
+    //     path[fill] {
+    //       fill: $color-black;
+    //     }
+    //   }
+    // }
+  }
+
+  :deep(input) {
+    height: 56px;
+    padding: 8px 24px;
+    border: 1px solid $color-grey-500;
+    border-radius: 50px;
+    transition: border-color $transition ease;
   }
 
   :deep(.btn) {
-    width: 36px;
-    height: 36px;
-    border-left: 1px solid $color-grey-500;
+    width: 56px;
+    height: 56px;
+    border-radius: 50px;
+    border-color: $color-black;
     transition: border-color $transition ease;
+
+    .icon {
+      path[stroke] {
+        stroke: $color-black;
+      }
+      path[fill] {
+        fill: $color-black;
+      }
+    }
   }
 }
 </style>
