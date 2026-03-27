@@ -9,10 +9,13 @@
     <footer>
       <h2>Footer</h2>
     </footer>
+    <ModalGlobal />
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import ModalGlobal from '@/components/Modal/index.vue';
+</script>
 
 <style lang="scss">
 .default-layout {

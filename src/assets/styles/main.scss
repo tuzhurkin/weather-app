@@ -1,6 +1,6 @@
 @use 'vars' as *;
 @use 'mixins' as *;
-// @use 'fonts';
+@use 'fonts';
 
 body,
 html {
@@ -21,6 +21,25 @@ html {
   @media (max-width: $md) {
     font-size: 18px;
   }
+}
+
+:root {
+  --scrollPageBarWidth: 16px;
+}
+
+body.scrolllock {
+  overflow: hidden;
+  &:not(.no-scroll) {
+    padding-right: var(--scrollPageBarWidth);
+    header.header {
+      padding-right: var(--scrollPageBarWidth);
+    }
+  }
+}
+
+.no-scroll {
+  overflow: hidden;
+  padding-right: var(--scrollPageBarWidth);
 }
 
 img {

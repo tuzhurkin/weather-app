@@ -1,11 +1,17 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { API_KEY, API_URL } from '@/constants/config';
+import { API_KEY, API_URL, ACTIVE_CARDS_LIMIT, SAVED_CARDS_LIMIT } from '@/constants/config';
+import { ModalName } from '@/constants/modal';
+import { useLayoutStore } from '@/stores/LayoutStore';
 import { useRoute } from 'vue-router';
 
 export const useCardsStore = defineStore('cards', () => {
   const route = useRoute();
+  const store = useLayoutStore();
+
   const isPageSaved = computed(() => route.name === 'SavedPage');
+  const currentCardsLimitModal = ref('active'); // 'active' | 'saved'
+  const activeCard = ref(null);
 
   const activeCards = ref([]);
   const savedCards = ref([]);
@@ -36,6 +42,10 @@ export const useCardsStore = defineStore('cards', () => {
     }
   };
 
+  const setCurrentCardsLimitModal = modal => {
+    currentCardsLimitModal.value = modal;
+  };
+
   const onSearch = async value => {
     citySearchValue.value = value;
     await fetchWeatherData();
@@ -59,27 +69,69 @@ export const useCardsStore = defineStore('cards', () => {
   };
 
   const addCard = card => {
-    if (activeCards.value.find(c => c.id === card.id)) return;
+    if (activeCards.value.length >= ACTIVE_CARDS_LIMIT) {
+      setCurrentCardsLimitModal('active');
+      store.SHOW_Modal(ModalName.CARDS_LIMIT);
+      return;
+    }
+
+    if (isCardActive(card)) {
+      setActiveCard(card);
+      store.SHOW_Modal(ModalName.ALREADY_ADDED);
+      return;
+    }
 
     const builtCard = buildCard(card);
     activeCards.value.unshift(builtCard);
   };
 
+  // add to saved
   const saveCard = card => {
-    if (savedCards.value.find(c => c.id === card.id)) {
-      savedCards.value = savedCards.value.filter(c => c.id !== card.id);
-    } else {
-      savedCards.value.unshift(card);
+    if (savedCards.value.length >= SAVED_CARDS_LIMIT) {
+      setCurrentCardsLimitModal('saved');
+      store.SHOW_Modal(ModalName.CARDS_LIMIT);
+      return;
     }
+
+    if (isCardSaved(card)) {
+      setActiveCard(card);
+      store.SHOW_Modal(ModalName.ALREADY_ADDED);
+      return;
+    }
+
+    savedCards.value.unshift(card);
   };
 
+  // remove card from saved cards
+  const unsaveCard = card => {
+    if (!isCardSaved(card)) return;
+
+    savedCards.value = savedCards.value.filter(c => c.id !== card.id);
+  };
+
+  // remove card from active cards
   const deleteCard = card => {
-    console.log('deleteCard', card, activeCards.value);
+    if (!isCardActive(card)) return;
+
     activeCards.value = activeCards.value.filter(c => c.id !== card.id);
+  };
+
+  const setActiveCard = card => {
+    activeCard.value = card;
+  };
+
+  const isCardActive = card => {
+    return activeCards.value.some(c => c.id === card.id);
+  };
+
+  const isCardSaved = card => {
+    return savedCards.value.some(c => c.id === card.id);
   };
 
   return {
     isPageSaved,
+    currentCardsLimitModal,
+    activeCard,
     activeCards,
     savedCards,
     citySearchValue,
@@ -88,6 +140,11 @@ export const useCardsStore = defineStore('cards', () => {
     buildCard,
     onSearch,
     saveCard,
+    unsaveCard,
     deleteCard,
+    setActiveCard,
+    setCurrentCardsLimitModal,
+    isCardActive,
+    isCardSaved,
   };
 });

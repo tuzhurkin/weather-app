@@ -25,9 +25,9 @@
         type="icony"
         icon="bookmark"
         :class="{ saved: isCardSaved }"
-        @click="saveCard(card)"
+        @click="onSaveClick"
       />
-      <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="deleteCard(card)" />
+      <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="onDeleteClick" />
     </div>
   </div>
 </template>
@@ -36,6 +36,8 @@
 import { computed } from 'vue';
 import { CONDITIONS } from '@/constants/conditions';
 import { storeToRefs } from 'pinia';
+import { ModalName } from '@/constants/modal';
+import { useLayoutStore } from '@/stores/LayoutStore';
 import { useCardsStore } from '@/stores/CardsStore';
 import BaseIcon from '@/components/Base/Icon.vue';
 import BaseButton from '@/components/Base/Button.vue';
@@ -52,9 +54,10 @@ const props = defineProps({
   },
 });
 
+const store = useLayoutStore();
 const cardsStore = useCardsStore();
 const { savedCards, isPageSaved } = storeToRefs(cardsStore);
-const { saveCard, deleteCard } = cardsStore;
+const { saveCard, unsaveCard, setActiveCard } = cardsStore;
 
 const icon = computed(() => {
   return `conditions/${CONDITIONS[props.card.icon]}`;
@@ -63,6 +66,19 @@ const icon = computed(() => {
 const isCardSaved = computed(() => {
   return savedCards.value.some(c => c.id === props.card.id);
 });
+
+const onSaveClick = () => {
+  if (isCardSaved.value) {
+    unsaveCard(props.card);
+  } else {
+    saveCard(props.card);
+  }
+};
+
+const onDeleteClick = () => {
+  setActiveCard(props.card);
+  store.SHOW_Modal(ModalName.DELETE_CONFIRM);
+};
 </script>
 
 <style scoped lang="scss">

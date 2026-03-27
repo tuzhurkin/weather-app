@@ -114,8 +114,8 @@ button,
     column-gap: 10px;
     min-height: 50px;
     height: auto;
-    padding: 0 12px;
-    border-radius: 6px;
+    padding: 0 32px;
+    border-radius: 32px;
     border: 2px solid $color-yellow;
     background-color: transparent;
     transition:
@@ -126,10 +126,10 @@ button,
 
     font-family: $main-font;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 16px;
     line-height: 150%;
-    color: $color-white;
+    color: $color-yellow;
 
     span {
       font-family: inherit;
@@ -160,7 +160,83 @@ button,
       }
     }
     @include hover {
-      // background-color: $color-yellow-hover;
+      border-color: $color-yellow-hover;
+      color: $color-yellow-hover;
+
+      :deep(.icon) {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
+          stroke: $color-yellow-hover;
+        }
+        path[fill],
+        rect[fill],
+        circle[fill] {
+          fill: $color-yellow-hover;
+        }
+      }
+    }
+    &:focus {
+      border-color: $color-yellow-hover;
+      color: $color-yellow-hover;
+
+      :deep(.icon) {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
+          stroke: $color-yellow-hover;
+        }
+        path[fill],
+        rect[fill],
+        circle[fill] {
+          fill: $color-yellow-hover;
+        }
+      }
+    }
+    &:active {
+      transform: scale(0.97);
+      border-color: $color-yellow-hover;
+      color: $color-yellow-hover;
+
+      :deep(.icon) {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
+          stroke: $color-yellow-hover;
+        }
+        path[fill],
+        rect[fill],
+        circle[fill] {
+          fill: $color-yellow-hover;
+        }
+      }
+    }
+    &:disabled,
+    &.disabled {
+      pointer-events: none;
+      cursor: default;
+      border-color: $color-grey-500;
+      color: $color-grey-500;
+
+      :deep(.icon) {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
+          stroke: $color-grey-500;
+        }
+        path[fill],
+        rect[fill],
+        circle[fill] {
+          fill: $color-grey-500;
+        }
+      }
+    }
+
+    &.yellow {
+      background-color: $color-yellow;
+      border-color: $color-yellow;
+      color: $color-black;
+
       :deep(.icon) {
         path[stroke],
         rect[stroke],
@@ -173,56 +249,95 @@ button,
           fill: $color-black;
         }
       }
-    }
-    &:focus {
-      // background-color: $color-yellow-hover;
-      :deep(.icon) {
-        path[stroke],
-        rect[stroke],
-        circle[stroke] {
-          stroke: $color-white;
-        }
-        path[fill],
-        rect[fill],
-        circle[fill] {
-          fill: $color-white;
-        }
+      @include hover {
+        background-color: $color-yellow-hover;
+        border-color: $color-yellow-hover;
+      }
+      &:focus {
+        background-color: $color-yellow-hover;
+        border-color: $color-yellow-hover;
+      }
+      &:active {
+        transform: scale(0.97);
+        background-color: $color-yellow-hover;
+        border-color: $color-yellow-hover;
+      }
+      &:disabled,
+      &.disabled {
+        background-color: $color-grey-500;
+        border-color: $color-grey-500;
       }
     }
-    &:active {
-      transform: scale(0.97);
-      // background-color: $color-yellow-hover;
+
+    &.green {
+      background-color: $color-green;
+      border-color: $color-green;
+      color: $color-black;
+
       :deep(.icon) {
         path[stroke],
         rect[stroke],
         circle[stroke] {
-          stroke: $color-white;
+          stroke: $color-black;
         }
         path[fill],
         rect[fill],
         circle[fill] {
-          fill: $color-white;
+          fill: $color-black;
         }
       }
+      @include hover {
+        background-color: $color-green-hover;
+        border-color: $color-green-hover;
+      }
+      &:focus {
+        background-color: $color-green-hover;
+        border-color: $color-green-hover;
+      }
+      &:active {
+        background-color: $color-green-hover;
+        border-color: $color-green-hover;
+      }
+      &:disabled,
+      &.disabled {
+        background-color: $color-grey-500;
+        border-color: $color-grey-500;
+      }
     }
-    &:disabled,
-    &.disabled {
-      pointer-events: none;
-      cursor: default;
-      color: $color-grey-500;
-      border-color: $color-grey-500;
-      background-color: $color-white;
+
+    &.red {
+      background-color: $color-error;
+      border-color: $color-error;
+      color: $color-black;
+
       :deep(.icon) {
         path[stroke],
         rect[stroke],
         circle[stroke] {
-          stroke: $color-grey-500;
+          stroke: $color-black;
         }
         path[fill],
         rect[fill],
         circle[fill] {
-          fill: $color-grey-500;
+          fill: $color-black;
         }
+      }
+      @include hover {
+        background-color: $color-error-hover;
+        border-color: $color-error-hover;
+      }
+      &:focus {
+        background-color: $color-error-hover;
+        border-color: $color-error-hover;
+      }
+      &:active {
+        background-color: $color-error-hover;
+        border-color: $color-error-hover;
+      }
+      &:disabled,
+      &.disabled {
+        background-color: $color-grey-500;
+        border-color: $color-grey-500;
       }
     }
   }
@@ -332,10 +447,10 @@ button,
     column-gap: 6px;
     font-family: $main-font;
     font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
+    font-weight: 600;
+    font-size: 18px;
     line-height: 150%;
-    color: $color-grey-500;
+    color: $color-grey-200;
     transition: color $transition ease;
 
     span {
@@ -357,55 +472,57 @@ button,
       rect[stroke],
       circle[stroke] {
         transition: stroke $transition ease;
+        stroke: $color-grey-200;
       }
       path[fill],
       rect[fill],
       circle[fill] {
         transition: fill $transition ease;
+        fill: $color-grey-200;
       }
     }
     @include hover {
-      color: $color-black;
+      color: $color-white;
       :deep(.icon) {
         path[stroke],
         rect[stroke],
         circle[stroke] {
-          stroke: $color-black;
+          stroke: $color-white;
         }
         path[fill],
         rect[fill],
         circle[fill] {
-          fill: $color-black;
+          fill: $color-white;
         }
       }
     }
     &:focus {
-      color: $color-black;
+      color: $color-white;
       :deep(.icon) {
         path[stroke],
         rect[stroke],
         circle[stroke] {
-          stroke: $color-black;
+          stroke: $color-white;
         }
         path[fill],
         rect[fill],
         circle[fill] {
-          fill: $color-black;
+          fill: $color-white;
         }
       }
     }
     &:active {
-      color: $color-black;
+      color: $color-white;
       :deep(.icon) {
         path[stroke],
         rect[stroke],
         circle[stroke] {
-          stroke: $color-black;
+          stroke: $color-white;
         }
         path[fill],
         rect[fill],
         circle[fill] {
-          fill: $color-black;
+          fill: $color-white;
         }
       }
     }
