@@ -4,7 +4,7 @@
       <Switcher />
     </div>
     <Project>
-      <ProjectActive />
+      <ProjectSaved />
     </Project>
   </div>
 </template>
@@ -12,10 +12,10 @@
 <script setup>
 import Switcher from '@/components/Switcher/index.vue';
 import Project from '@/components/Project/index.vue';
-import ProjectActive from '@/components/Project/Active.vue';
+import ProjectSaved from '@/components/Project/Saved.vue';
 
 defineOptions({
-  name: 'MainPage',
+  name: 'SavedPage',
 });
 </script>
 

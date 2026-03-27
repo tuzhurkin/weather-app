@@ -98,7 +98,9 @@ button,
     flex-shrink: 0;
     overflow: visible;
 
-    path {
+    path,
+    rect,
+    circle {
       &[stroke] {
         transition: stroke $transition ease;
       }
@@ -144,11 +146,15 @@ button,
       object-fit: contain;
       object-position: center;
 
-      path[stroke] {
+      path[stroke],
+      rect[stroke],
+      circle[stroke] {
         transition: stroke $transition ease;
         stroke: $color-white;
       }
-      path[fill] {
+      path[fill],
+      rect[fill],
+      circle[fill] {
         transition: fill $transition ease;
         fill: $color-white;
       }
@@ -156,10 +162,14 @@ button,
     @include hover {
       // background-color: $color-yellow-hover;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-black;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-black;
         }
       }
@@ -167,10 +177,14 @@ button,
     &:focus {
       // background-color: $color-yellow-hover;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-white;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-white;
         }
       }
@@ -179,10 +193,14 @@ button,
       transform: scale(0.97);
       // background-color: $color-yellow-hover;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-white;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-white;
         }
       }
@@ -195,10 +213,14 @@ button,
       border-color: $color-grey-500;
       background-color: $color-white;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-grey-500;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-grey-500;
         }
       }
@@ -223,11 +245,15 @@ button,
       object-fit: contain;
       object-position: center;
 
-      path[stroke] {
+      path[stroke],
+      rect[stroke],
+      circle[stroke] {
         transition: stroke $transition ease;
         stroke: $color-yellow;
       }
-      path[fill] {
+      path[fill],
+      rect[fill],
+      circle[fill] {
         transition: fill $transition ease;
         fill: $color-yellow;
       }
@@ -236,10 +262,14 @@ button,
       border-color: $color-yellow-hover;
       // background-color: $color-white;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-yellow-hover;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-yellow-hover;
         }
       }
@@ -248,10 +278,14 @@ button,
       border-color: $color-yellow-hover;
       // background-color: $color-white;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-yellow-hover;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-yellow-hover;
         }
       }
@@ -261,10 +295,14 @@ button,
       border-color: $color-yellow-hover;
       // background-color: $color-white;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-yellow-hover;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-yellow-hover;
         }
       }
@@ -276,10 +314,14 @@ button,
       border-color: $color-grey-500;
       background-color: transparent;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-grey-500;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-grey-500;
         }
       }
@@ -311,20 +353,28 @@ button,
       object-fit: contain;
       object-position: center;
 
-      path[stroke] {
+      path[stroke],
+      rect[stroke],
+      circle[stroke] {
         transition: stroke $transition ease;
       }
-      path[fill] {
+      path[fill],
+      rect[fill],
+      circle[fill] {
         transition: fill $transition ease;
       }
     }
     @include hover {
       color: $color-black;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-black;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-black;
         }
       }
@@ -332,10 +382,14 @@ button,
     &:focus {
       color: $color-black;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-black;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-black;
         }
       }
@@ -343,10 +397,14 @@ button,
     &:active {
       color: $color-black;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-black;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-black;
         }
       }
@@ -357,10 +415,14 @@ button,
       cursor: default;
       color: $color-grey-500;
       :deep(.icon) {
-        path[stroke] {
+        path[stroke],
+        rect[stroke],
+        circle[stroke] {
           stroke: $color-grey-500;
         }
-        path[fill] {
+        path[fill],
+        rect[fill],
+        circle[fill] {
           fill: $color-grey-500;
         }
       }

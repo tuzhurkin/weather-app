@@ -76,6 +76,7 @@ const onClickOutside = () => {
     width: 100%;
     background-color: $color-grey-700;
     border-radius: 10px;
+    box-shadow: 0 20px 32px rgba(0, 0, 0, 0.5);
 
     .results {
       .result {

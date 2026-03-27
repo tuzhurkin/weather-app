@@ -6,7 +6,9 @@
         <span>{{ card.city }}, {{ card.country }}</span>
       </div>
       <div class="temp">{{ Math.round(card.temp) }}°C</div>
-      <div class="feels-like"><span>feels like:</span> {{ Math.round(card.feels_like) }}°C</div>
+      <div class="feels-like">
+        feels like: <span>{{ Math.round(card.feels_like) }}°C</span>
+      </div>
     </div>
     <div class="middle">
       <BaseIcon :name="icon" class="condition" />
@@ -18,14 +20,25 @@
       <CardStat name="wind" :value="card.wind + ' km/h'" />
       <CardStat name="humidity" :value="card.humidity + '%'" />
     </div>
+    <div class="controls" :class="{ shown: isPageSaved }">
+      <BaseButton
+        type="icony"
+        icon="bookmark"
+        :class="{ saved: isCardSaved }"
+        @click="saveCard(card)"
+      />
+      <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="deleteCard(card)" />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
 import { CONDITIONS } from '@/constants/conditions';
-// import { STATS } from '@/constants/stats';
+import { storeToRefs } from 'pinia';
+import { useCardsStore } from '@/stores/CardsStore';
 import BaseIcon from '@/components/Base/Icon.vue';
+import BaseButton from '@/components/Base/Button.vue';
 import CardStat from '@/components/Card/Stat.vue';
 
 defineOptions({
@@ -39,17 +52,28 @@ const props = defineProps({
   },
 });
 
+const cardsStore = useCardsStore();
+const { savedCards, isPageSaved } = storeToRefs(cardsStore);
+const { saveCard, deleteCard } = cardsStore;
+
 const icon = computed(() => {
   return `conditions/${CONDITIONS[props.card.icon]}`;
+});
+
+const isCardSaved = computed(() => {
+  return savedCards.value.some(c => c.id === props.card.id);
 });
 </script>
 
 <style scoped lang="scss">
 .card {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  // display: grid;
+  // grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  column-gap: 16px;
   padding: 32px 100px;
   width: 100%;
   border-radius: 50px;
@@ -96,42 +120,112 @@ const icon = computed(() => {
     }
   }
 
-  .top {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  .temp {
+    font-weight: 500;
+    font-size: 88px;
+    line-height: 100%;
+  }
 
-    .temp {
-      font-weight: 500;
-      font-size: 88px;
-      line-height: 100%;
-    }
+  .feels-like {
+    padding: 8px 12px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    text-align: center;
+    border-radius: 50px;
+    color: $color-grey-300;
+    background-color: $color-grey-750;
 
-    .feels-like {
-      padding: 8px 12px;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 120%;
-      text-align: center;
-      border-radius: 50px;
-      background-color: $color-grey-750;
-
-      span {
-        color: $color-grey-300;
-      }
+    span {
+      margin-left: 2px;
+      color: $color-grey-200;
     }
   }
 
-  .middle {
+  .top,
+  .middle,
+  .bottom {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
   .bottom {
+    padding-right: 32px;
+  }
+
+  .controls {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 32px;
+    position: absolute;
+    top: 50%;
+    right: 36px;
+    transform: translate(0, -50%);
+    height: calc(100% - 88px);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity $transition ease;
+
+    &.shown {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    :deep(.btn) {
+      width: 36px;
+      height: 36px;
+      border: none;
+
+      &.saved {
+        .icon {
+          &.bookmark {
+            path[stroke] {
+              stroke: $color-green;
+            }
+            path[fill] {
+              fill: $color-green;
+            }
+          }
+        }
+      }
+
+      .icon {
+        width: 36px;
+        height: 36px;
+
+        &.bookmark {
+          @include hover {
+            path[stroke] {
+              stroke: $color-green;
+            }
+            path[fill] {
+              fill: $color-green;
+            }
+          }
+        }
+
+        &.trash {
+          @include hover {
+            path[stroke] {
+              stroke: $color-error;
+            }
+            path[fill] {
+              fill: $color-error;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @include hover {
+    .controls {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
 }
 </style>

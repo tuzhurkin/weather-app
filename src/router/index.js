@@ -1,4 +1,5 @@
 import MainPage from '@/views/index.vue';
+import SavedPage from '@/views/saved/index.vue';
 import NotFound from '@/views/notFound.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -9,6 +10,15 @@ const routes = [
     component: MainPage,
     meta: {
       title: 'Main Page',
+      layout: 'DefaultLayout',
+    },
+  },
+  {
+    path: '/saved',
+    name: 'SavedPage',
+    component: SavedPage,
+    meta: {
+      title: 'Saved Page',
       layout: 'DefaultLayout',
     },
   },

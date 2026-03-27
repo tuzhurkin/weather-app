@@ -12,7 +12,7 @@
       @focus="focus"
       @blur="blur"
     />
-    <BaseButton type="icony" icon="search" :disabled="!modelValue" @click="onSearchButtonClick" />
+    <BaseButton type="icony" icon="magnifer" :disabled="!modelValue" @click="onSearchButtonClick" />
   </label>
 </template>
 
