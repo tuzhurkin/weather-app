@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { API_KEY, API_URL, ACTIVE_CARDS_LIMIT, SAVED_CARDS_LIMIT } from '@/constants/config';
 import { ModalName } from '@/constants/modal';
 import { useLayoutStore } from '@/stores/LayoutStore';
@@ -127,6 +127,22 @@ export const useCardsStore = defineStore('cards', () => {
   const isCardSaved = card => {
     return savedCards.value.some(c => c.id === card.id);
   };
+
+  watch(
+    () => savedCards.value,
+    newVal => {
+      console.log('watch set savedCards to localStorage', newVal);
+      localStorage.setItem('savedCards', JSON.stringify(newVal));
+    },
+    { deep: true }
+  );
+
+  // onMounted(() => {
+  const savedCardsData = localStorage.getItem('savedCards');
+  if (savedCardsData) {
+    savedCards.value = JSON.parse(savedCardsData);
+  }
+  // });
 
   return {
     isPageSaved,
