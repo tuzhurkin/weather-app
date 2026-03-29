@@ -65,6 +65,7 @@ const updateModelValue = value => {
 
 const focus = () => {
   focused.value = true;
+  emit('focus');
 };
 
 const blur = () => {

@@ -11,22 +11,23 @@ export const useCardsStore = defineStore('cards', () => {
 
   const isPageSaved = computed(() => route.name === 'SavedPage');
   const currentCardsLimitModal = ref('active'); // 'active' | 'saved'
-  const activeCard = ref(null);
 
+  const activeCitySearchValue = ref('');
+  const activeCity = ref(null);
+  const activeCard = ref(null);
   const activeCards = ref([]);
   const savedCards = ref([]);
 
-  const citySearchValue = ref('');
   const loading = ref(false);
   const error = ref(null);
 
-  const fetchWeatherData = async () => {
-    if (!citySearchValue.value) return;
+  const fetchWeatherData = async ({ name, lat, lon }) => {
+    if (!name || !lat || !lon) return;
 
     loading.value = true;
     try {
       const response = await fetch(
-        `${API_URL}?q=${citySearchValue.value}&appid=${API_KEY}&units=metric`
+        `${API_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
       );
       const data = await response.json();
 
@@ -34,7 +35,8 @@ export const useCardsStore = defineStore('cards', () => {
       if (!success) throw new Error(data.message);
 
       console.log('fetchWeatherData', data);
-      addCard(data);
+      // set city name taken from geo (due to imprecise city name in weather response)
+      addCard({ ...data, name: name });
     } catch (error) {
       console.error(error);
     } finally {
@@ -46,9 +48,17 @@ export const useCardsStore = defineStore('cards', () => {
     currentCardsLimitModal.value = modal;
   };
 
+  const setActiveCitySearchValue = value => {
+    activeCitySearchValue.value = value;
+  };
+
+  const setActiveCity = city => {
+    activeCity.value = city;
+  };
+
   const onSearch = async value => {
-    citySearchValue.value = value;
-    await fetchWeatherData();
+    setActiveCity(value);
+    await fetchWeatherData(activeCity.value);
   };
 
   const buildCard = card => {
@@ -69,15 +79,15 @@ export const useCardsStore = defineStore('cards', () => {
   };
 
   const addCard = card => {
-    if (activeCards.value.length >= ACTIVE_CARDS_LIMIT) {
-      setCurrentCardsLimitModal('active');
-      store.SHOW_Modal(ModalName.CARDS_LIMIT);
-      return;
-    }
-
     if (isCardActive(card)) {
       setActiveCard(card);
       store.SHOW_Modal(ModalName.ALREADY_ADDED);
+      return;
+    }
+
+    if (activeCards.value.length >= ACTIVE_CARDS_LIMIT) {
+      setCurrentCardsLimitModal('active');
+      store.SHOW_Modal(ModalName.CARDS_LIMIT);
       return;
     }
 
@@ -145,19 +155,23 @@ export const useCardsStore = defineStore('cards', () => {
   return {
     isPageSaved,
     currentCardsLimitModal,
+    activeCitySearchValue,
+    activeCity,
     activeCard,
     activeCards,
     savedCards,
-    citySearchValue,
     loading,
     error,
-    buildCard,
+    setCurrentCardsLimitModal,
+    setActiveCitySearchValue,
+    setActiveCity,
     onSearch,
+    buildCard,
+    addCard,
     saveCard,
     unsaveCard,
     deleteCard,
     setActiveCard,
-    setCurrentCardsLimitModal,
     isCardActive,
     isCardSaved,
   };

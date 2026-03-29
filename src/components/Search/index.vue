@@ -1,6 +1,6 @@
 <template>
   <div class="search-autocomplete">
-    <BaseSearch v-bind="searchData" v-model="query" @search="onSearch" />
+    <BaseSearch v-bind="searchData" v-model="query" @focus="onFocus" @search="onSearch" />
     <div v-show="isResultsVisible" v-on-click-outside="onClickOutside" class="results-box">
       <ul v-if="!loading" class="results">
         <li v-for="result in results" :key="result.id" @click="selectCity(result)" class="result">
@@ -18,15 +18,21 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { ModalName } from '@/constants/modal';
 import { vOnClickOutside } from '@vueuse/components';
+import { useLayoutStore } from '@/stores/LayoutStore';
+import { useCardsStore } from '@/stores/CardsStore';
+import { useCitySearch } from '@/composables/useCitySearch';
 import BaseSearch from '@/components/Base/Search.vue';
 import BasePreloader from '@/components/Base/Preloader.vue';
-import { useCitySearch } from '@/composables/useCitySearch';
 
 defineOptions({
   name: 'SearchAutocomplete',
 });
 
+const store = useLayoutStore();
+const cardsStore = useCardsStore();
+const { setActiveCitySearchValue } = cardsStore;
 const { query, results, loading } = useCitySearch();
 
 const emit = defineEmits(['select']);
@@ -48,17 +54,28 @@ watch(results, value => {
 });
 
 const selectCity = city => {
-  const cityName = city.name;
-  emit('select', cityName);
+  emit('select', city);
   open.value = false;
+};
+
+const onFocus = () => {
+  open.value = true;
 };
 
 const onSearch = value => {
-  emit('select', value);
+  if (!results.value.length) {
+    setActiveCitySearchValue(value);
+    store.SHOW_Modal(ModalName.NO_CITIES_FOUND);
+    return;
+  }
+
+  const city = results.value[0];
+  emit('select', city);
   open.value = false;
 };
 
-const onClickOutside = () => {
+const onClickOutside = e => {
+  if (e.target.closest('.search')) return;
   if (open.value) open.value = false;
 };
 </script>
