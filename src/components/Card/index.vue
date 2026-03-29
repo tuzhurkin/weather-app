@@ -40,7 +40,8 @@
     </div>
     <div class="chart">
       <div class="cover cover--chart"></div>
-      <CardForecast :forecast="card.todayForecast" />
+      <!-- <CardForecast :forecast="card.dayForecast" /> -->
+      <CardForecast :forecast="card.weekForecast" />
     </div>
   </div>
 </template>

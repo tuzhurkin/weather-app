@@ -53,23 +53,50 @@ export const useCardsStore = defineStore('cards', () => {
         fetchForecastData({ lat, lon }),
       ]);
 
-      // get forecast data list for the current day
-      // const today = new Date().toISOString().split('T')[0];
-      // const todayForecast = forecastData.list.filter(item => item.dt_txt.startsWith(today));
-
-      // get forecast data list for the next 24 hours
-      const now = Date.now() / 1000;
-      const in24h = now + 86400; // 24 hours in seconds
-      const todayForecast = forecastData.list.filter(item => item.dt >= now && item.dt <= in24h);
+      const dayForecast = get24HoursForecast(forecastData);
+      const weekForecast = get5DayForecast(forecastData);
 
       // use geo city name as weather API returns imprecise names
-      addCard({ ...weatherData, name }, todayForecast);
+      addCard({ ...weatherData, name }, dayForecast, weekForecast);
     } catch (err) {
       error.value = err.message;
       console.error(err);
     } finally {
       loading.value = false;
     }
+  };
+
+  // const getTodayForecast = forecastData => {
+  //   const today = new Date().toISOString().split('T')[0];
+  //   return forecastData.list.filter(item => item.dt_txt.startsWith(today));
+  // };
+
+  const get24HoursForecast = forecastData => {
+    const now = Date.now() / 1000;
+    const in24h = now + 86400; // 24 hours in seconds
+    return forecastData.list
+      .filter(item => item.dt >= now && item.dt <= in24h)
+      .map(item => ({
+        label: item.dt_txt.split(' ')[1].slice(0, 5),
+        temp: Math.round(item.main.temp),
+      }));
+  };
+
+  const get5DayForecast = forecastData => {
+    const groups = {};
+    forecastData.list.forEach(item => {
+      const date = item.dt_txt.split(' ')[0];
+      if (!groups[date]) groups[date] = [];
+      groups[date].push(item.main.temp);
+    });
+
+    return Object.entries(groups)
+      .slice(0, 5)
+      .map(([date, temps]) => {
+        const temp = Math.round(temps.reduce((sum, t) => sum + t, 0) / temps.length);
+        const label = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+        return { label, temp };
+      });
   };
 
   const setCurrentCardsLimitModal = modal => {
@@ -89,7 +116,7 @@ export const useCardsStore = defineStore('cards', () => {
     await requestCityData();
   };
 
-  const buildCard = (card, todayForecast = []) => {
+  const buildCard = (card, dayForecast = [], weekForecast = []) => {
     return {
       id: card.id,
       city: card.name,
@@ -103,11 +130,12 @@ export const useCardsStore = defineStore('cards', () => {
       title: card.weather[0].main,
       description: card.weather[0].description,
       icon: card.weather[0].icon,
-      todayForecast,
+      dayForecast,
+      weekForecast,
     };
   };
 
-  const addCard = (card, todayForecast = []) => {
+  const addCard = (card, dayForecast = [], weekForecast = []) => {
     if (isCardActive(card)) {
       setActiveCard(card);
       store.SHOW_Modal(ModalName.ALREADY_ADDED);
@@ -120,7 +148,7 @@ export const useCardsStore = defineStore('cards', () => {
       return;
     }
 
-    activeCards.value.unshift(buildCard(card, todayForecast));
+    activeCards.value.unshift(buildCard(card, dayForecast, weekForecast));
   };
 
   // add to saved

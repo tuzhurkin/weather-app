@@ -9,7 +9,10 @@ import { Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip }
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
 const props = defineProps({
-  chartData: Array,
+  chartData: {
+    type: Array,
+    required: true,
+  },
 });
 
 const chartData = computed(() => props.chartData);
@@ -18,8 +21,8 @@ let chartInstance = null;
 
 const prepareData = () => {
   return {
-    labels: chartData.value.map(item => item.dt_txt.split(' ')[1].slice(0, 5)),
-    temps: chartData.value.map(item => Math.round(item.main.temp)),
+    labels: chartData.value.map(item => item.label),
+    temps: chartData.value.map(item => item.temp),
   };
 };
 
