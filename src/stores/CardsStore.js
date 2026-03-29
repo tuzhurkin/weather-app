@@ -21,24 +21,52 @@ export const useCardsStore = defineStore('cards', () => {
   const loading = ref(false);
   const error = ref(null);
 
-  const fetchWeatherData = async ({ name, lat, lon }) => {
+  const fetchWeatherData = async ({ lat, lon }) => {
+    const response = await fetch(
+      `${API_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+    );
+    const data = await response.json();
+    const success = data.cod === 200 || data.cod === '200';
+    if (!success) throw new Error(data.message);
+    return data;
+  };
+
+  const fetchForecastData = async ({ lat, lon }) => {
+    const response = await fetch(
+      `${API_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+    );
+    const data = await response.json();
+    const success = data.cod === 200 || data.cod === '200';
+    if (!success) throw new Error(data.message);
+    return data;
+  };
+
+  const requestCityData = async () => {
+    const { name, lat, lon } = activeCity.value;
     if (!name || !lat || !lon) return;
 
     loading.value = true;
+    error.value = null;
     try {
-      const response = await fetch(
-        `${API_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
-      );
-      const data = await response.json();
+      const [weatherData, forecastData] = await Promise.all([
+        fetchWeatherData({ lat, lon }),
+        fetchForecastData({ lat, lon }),
+      ]);
 
-      const success = data.cod === 200;
-      if (!success) throw new Error(data.message);
+      // get forecast data list for the current day
+      // const today = new Date().toISOString().split('T')[0];
+      // const todayForecast = forecastData.list.filter(item => item.dt_txt.startsWith(today));
 
-      console.log('fetchWeatherData', data);
-      // set city name taken from geo (due to imprecise city name in weather response)
-      addCard({ ...data, name: name });
-    } catch (error) {
-      console.error(error);
+      // get forecast data list for the next 24 hours
+      const now = Date.now() / 1000;
+      const in24h = now + 86400; // 24 hours in seconds
+      const todayForecast = forecastData.list.filter(item => item.dt >= now && item.dt <= in24h);
+
+      // use geo city name as weather API returns imprecise names
+      addCard({ ...weatherData, name }, todayForecast);
+    } catch (err) {
+      error.value = err.message;
+      console.error(err);
     } finally {
       loading.value = false;
     }
@@ -58,10 +86,10 @@ export const useCardsStore = defineStore('cards', () => {
 
   const onSearch = async value => {
     setActiveCity(value);
-    await fetchWeatherData(activeCity.value);
+    await requestCityData();
   };
 
-  const buildCard = card => {
+  const buildCard = (card, todayForecast = []) => {
     return {
       id: card.id,
       city: card.name,
@@ -75,10 +103,11 @@ export const useCardsStore = defineStore('cards', () => {
       title: card.weather[0].main,
       description: card.weather[0].description,
       icon: card.weather[0].icon,
+      todayForecast,
     };
   };
 
-  const addCard = card => {
+  const addCard = (card, todayForecast = []) => {
     if (isCardActive(card)) {
       setActiveCard(card);
       store.SHOW_Modal(ModalName.ALREADY_ADDED);
@@ -91,8 +120,7 @@ export const useCardsStore = defineStore('cards', () => {
       return;
     }
 
-    const builtCard = buildCard(card);
-    activeCards.value.unshift(builtCard);
+    activeCards.value.unshift(buildCard(card, todayForecast));
   };
 
   // add to saved

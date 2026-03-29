@@ -35,6 +35,9 @@
       />
       <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="onDeleteClick" />
     </div>
+    <div class="chart">
+      <CardForecast :forecast="card.todayForecast" />
+    </div>
   </div>
 </template>
 
@@ -48,6 +51,7 @@ import { useCardsStore } from '@/stores/CardsStore';
 import BaseIcon from '@/components/Base/Icon.vue';
 import BaseButton from '@/components/Base/Button.vue';
 import CardStat from '@/components/Card/Stat.vue';
+import CardForecast from '@/components/Card/Forecast.vue';
 
 defineOptions({
   name: 'Card',
@@ -96,8 +100,10 @@ const onDeleteClick = () => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   column-gap: 16px;
+  row-gap: 32px;
   padding: 32px 100px;
   width: 100%;
+  color: $color-grey-200;
   border-radius: 50px;
   // background-color: $color-grey-750;
   background: linear-gradient(150deg, $color-grey-600 0%, $color-grey-750 103.55%);
@@ -211,16 +217,20 @@ const onDeleteClick = () => {
     }
   }
 
+  .chart {
+    grid-column: 1 / -1;
+  }
+
   .controls {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 32px;
+    gap: 36px;
     position: absolute;
-    top: 50%;
+    top: 32px;
     right: 36px;
-    transform: translate(0, -50%);
-    height: calc(100% - 72px);
+    height: 178px; // calc(100% - 72px);
+    padding: 4px 0;
 
     opacity: 0;
     pointer-events: none;
