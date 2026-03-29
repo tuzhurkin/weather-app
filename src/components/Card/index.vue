@@ -1,6 +1,7 @@
 <template>
   <div class="card">
     <div class="top">
+      <div class="cover cover--top"></div>
       <div class="info">
         <div class="location">
           <BaseIcon name="stats/point-low" />
@@ -15,10 +16,12 @@
       </div>
     </div>
     <div class="middle">
+      <div class="cover cover--middle"></div>
       <BaseIcon :name="icon" class="condition" />
       <div class="title">{{ card.title }}</div>
     </div>
     <div class="bottom">
+      <div class="cover cover--bottom"></div>
       <div class="stats">
         <CardStat name="temp_max" :value="Math.round(card.temp_max) + '°C'" />
         <CardStat name="temp_min" :value="Math.round(card.temp_min) + '°C'" />
@@ -36,6 +39,7 @@
       <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="onDeleteClick" />
     </div>
     <div class="chart">
+      <div class="cover cover--chart"></div>
       <CardForecast :forecast="card.todayForecast" />
     </div>
   </div>
@@ -94,9 +98,7 @@ const onDeleteClick = () => {
 <style scoped lang="scss">
 .card {
   position: relative;
-  // display: flex;
-  // justify-content: space-between;
-  // align-items: center;
+  overflow: hidden;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   column-gap: 16px;
@@ -105,8 +107,7 @@ const onDeleteClick = () => {
   width: 100%;
   color: $color-grey-200;
   border-radius: 50px;
-  // background-color: $color-grey-750;
-  background: linear-gradient(150deg, $color-grey-600 0%, $color-grey-750 103.55%);
+  background: linear-gradient(150deg, $color-grey-600 0%, $color-grey-750 105%);
 
   .condition {
     position: relative;
@@ -186,6 +187,7 @@ const onDeleteClick = () => {
   }
 
   .top {
+    position: relative;
     display: flex;
 
     .info {
@@ -197,6 +199,7 @@ const onDeleteClick = () => {
   }
 
   .middle {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -204,9 +207,10 @@ const onDeleteClick = () => {
   }
 
   .bottom {
+    position: relative;
     display: flex;
     justify-content: flex-end;
-    padding-right: 32px;
+    padding-right: 16px;
 
     .stats {
       display: flex;
@@ -218,7 +222,95 @@ const onDeleteClick = () => {
   }
 
   .chart {
+    position: relative;
     grid-column: 1 / -1;
+  }
+
+  // >>> reveal cover animation <<<
+  $gradient-color-0: #e8960a;
+  $gradient-color-1: $color-yellow;
+  $gradient-color-2: $color-yellow-hover;
+  $gradient-color-3: #f7d070;
+
+  .cover {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+
+    &--top {
+      top: -32px;
+      left: -100px;
+      right: 36px;
+      bottom: -32px;
+      z-index: 10;
+      background: linear-gradient(90deg, $gradient-color-0 0%, $gradient-color-1 100%);
+      animation-name: section-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.1s;
+    }
+
+    &--middle {
+      top: -32px;
+      left: -52px;
+      right: -52px;
+      bottom: -32px;
+      z-index: 10;
+      background: linear-gradient(90deg, $gradient-color-1 0%, $gradient-color-2 100%);
+      animation-name: section-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.3s;
+    }
+
+    &--bottom {
+      top: -32px;
+      left: 36px;
+      right: -100px;
+      bottom: -32px;
+      z-index: 10;
+      background: linear-gradient(90deg, $gradient-color-2 0%, $gradient-color-3 100%);
+      animation-name: section-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.5s;
+    }
+
+    &--chart {
+      top: -32px;
+      bottom: -32px;
+      left: -100px;
+      right: -100px;
+      z-index: 10;
+      border-radius: 0 0 44px 44px;
+      background: linear-gradient(
+        90deg,
+        $gradient-color-0 0%,
+        $gradient-color-1 40%,
+        $gradient-color-2 60%,
+        $gradient-color-3 100%
+      );
+      animation-name: chart-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.7s;
+    }
+  }
+
+  @keyframes section-cover-reveal {
+    from {
+      clip-path: inset(0 0 0 0);
+    }
+    to {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+
+  @keyframes chart-cover-reveal {
+    from {
+      clip-path: inset(0 0 0 0);
+    }
+    to {
+      clip-path: inset(100% 0 0 0);
+    }
   }
 
   .controls {

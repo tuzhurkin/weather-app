@@ -1,7 +1,7 @@
 <template>
-  <div class="project-cards">
+  <TransitionGroup tag="div" class="project-cards" name="card">
     <Card class="project-card" v-for="card in cards" :key="card.id" :card="card" />
-  </div>
+  </TransitionGroup>
 </template>
 
 <script setup>
@@ -20,6 +20,26 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
+.card-enter-active {
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.card-enter-from {
+  opacity: 0;
+  transform: translateY(-32px);
+}
+
+.card-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-move {
+  transition: transform 0.5s ease;
+}
+
 .project-cards {
   display: flex;
   flex-direction: column;
