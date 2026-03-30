@@ -17,7 +17,7 @@ defineOptions({
   gap: 32px;
   max-width: 1200px;
   min-width: 360px;
-  margin: 32px auto;
+  margin: 0 auto;
   min-height: 360px;
   padding: 32px;
 

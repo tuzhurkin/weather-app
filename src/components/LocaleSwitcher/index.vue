@@ -1,42 +1,22 @@
 <template>
-  <div class="locale-switcher">
-    <BaseButton type="texted" :class="{ active: locale === 'en' }" @click="setLocale('en')">
-      EN
-    </BaseButton>
-    <BaseButton type="texted" :class="{ active: locale === 'uk' }" @click="setLocale('uk')">
-      UK
-    </BaseButton>
-  </div>
+  <BaseSwitcher :options="options" :model-value="locale" @update:modelValue="setLocale" />
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
-import BaseButton from '@/components/Base/Button.vue';
+import BaseSwitcher from '@/components/Base/Switcher.vue';
 
 defineOptions({
   name: 'LocaleSwitcher',
 });
 
 const { locale, setLocale } = useLocale();
+
+const options = computed(() => [
+  { value: 'en', text: 'EN' },
+  { value: 'uk', text: 'UK' },
+]);
 </script>
 
-<style scoped lang="scss">
-.locale-switcher {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  :deep(.btn) {
-    min-height: 32px;
-    padding: 0 12px;
-    border-radius: 10px;
-    background-color: transparent;
-    color: $color-grey-200;
-
-    &.active {
-      color: $color-grey-800;
-      background-color: $color-yellow;
-    }
-  }
-}
-</style>
+<style scoped lang="scss"></style>

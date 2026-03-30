@@ -1,7 +1,7 @@
 <template>
   <div class="default-page main-page">
     <div class="switcher-wrapper">
-      <Switcher />
+      <PageSwitcher />
     </div>
     <Project>
       <ProjectSaved />
@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import Switcher from '@/components/Switcher/index.vue';
+import PageSwitcher from '@/components/PageSwitcher/index.vue';
 import Project from '@/components/Project/index.vue';
 import ProjectSaved from '@/components/Project/Saved.vue';
 
@@ -25,10 +25,10 @@ defineOptions({
   justify-content: center;
   width: 100%;
   max-width: 1200px;
-  margin: 32px auto;
+  margin: 32px auto 0;
 
   @media (max-width: $sm) {
-    margin: 16px auto;
+    margin: 16px auto 0;
     padding: 0 16px;
   }
 }
