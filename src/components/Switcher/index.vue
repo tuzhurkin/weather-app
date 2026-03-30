@@ -1,16 +1,19 @@
 <template>
   <div class="switcher">
-    <BaseButton tag="router-link" type="texted" to="/">Active</BaseButton>
-    <BaseButton tag="router-link" type="texted" to="/saved">Saved</BaseButton>
+    <BaseButton tag="router-link" type="texted" to="/">{{ translate('active') }}</BaseButton>
+    <BaseButton tag="router-link" type="texted" to="/saved">{{ translate('saved') }}</BaseButton>
   </div>
 </template>
 
 <script setup>
 import BaseButton from '@/components/Base/Button.vue';
+import { useTranslates } from '@/composables/useTranslates';
 
 defineOptions({
   name: 'Switcher',
 });
+
+const { translate } = useTranslates();
 </script>
 
 <style scoped lang="scss">

@@ -2,12 +2,12 @@
   <div class="tabs">
     <BaseButton
       :class="{ active: activeTab === 'day', transitioning: isTransitioning }"
-      text="24h"
+      :text="translate('24h')"
       @click="setTab('day')"
     />
     <BaseButton
       :class="{ active: activeTab === 'week', transitioning: isTransitioning }"
-      text="5d"
+      :text="translate('5d')"
       @click="setTab('week')"
     />
   </div>
@@ -25,6 +25,7 @@
 import { ref, onBeforeUnmount } from 'vue';
 import BaseButton from '@/components/Base/Button.vue';
 import CardForecast from '@/components/Card/Forecast.vue';
+import { useTranslates } from '@/composables/useTranslates';
 
 defineOptions({
   name: 'CardChartTabs',
@@ -36,6 +37,8 @@ defineProps({
     default: () => ({}),
   },
 });
+
+const { translate } = useTranslates();
 
 const TAB_DURATION = 500;
 const activeTab = ref('day');

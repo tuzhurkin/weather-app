@@ -2,12 +2,14 @@
   <Transition name="modal">
     <BaseModal class="modal-primary" :name="ModalName.DELETE_CONFIRM">
       <template #top>
-        <h3 class="title">Are you sure you want to delete this card?</h3>
+        <h3 class="title">{{ translate('modal_delete_confirm_title') }}</h3>
       </template>
       <div class="content">
         <div class="buttons">
-          <BaseButton type="primary red" @click="onDeleteClick">Delete</BaseButton>
-          <BaseButton type="primary" @click="onCancelClick">Cancel</BaseButton>
+          <BaseButton type="primary red" @click="onDeleteClick">{{
+            translate('delete')
+          }}</BaseButton>
+          <BaseButton type="primary" @click="onCancelClick">{{ translate('cancel') }}</BaseButton>
         </div>
       </div>
     </BaseModal>
@@ -21,6 +23,7 @@ import { useLayoutStore } from '@/stores/LayoutStore';
 import { useCardsStore } from '@/stores/CardsStore';
 import BaseModal from '@/components/Base/Modal.vue';
 import BaseButton from '@/components/Base/Button.vue';
+import { useTranslates } from '@/composables/useTranslates';
 
 defineOptions({
   name: 'ModalDeleteConfirm',
@@ -30,6 +33,7 @@ const store = useLayoutStore();
 const cardsStore = useCardsStore();
 const { activeCard } = storeToRefs(cardsStore);
 const { deleteCard } = cardsStore;
+const { translate } = useTranslates();
 
 const onDeleteClick = () => {
   if (!activeCard.value) return;

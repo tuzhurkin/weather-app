@@ -4,10 +4,12 @@ import { API_KEY, API_URL, ACTIVE_CARDS_LIMIT, SAVED_CARDS_LIMIT } from '@/const
 import { ModalName } from '@/constants/modal';
 import { useLayoutStore } from '@/stores/LayoutStore';
 import { useRoute } from 'vue-router';
+import { useLocale } from '@/composables/useLocale';
 
 export const useCardsStore = defineStore('cards', () => {
   const route = useRoute();
   const store = useLayoutStore();
+  const { locale } = useLocale();
 
   const isPageSaved = computed(() => route.name === 'SavedPage');
   const currentCardsLimitModal = ref('active'); // 'active' | 'saved'
@@ -24,7 +26,7 @@ export const useCardsStore = defineStore('cards', () => {
 
   const fetchWeatherData = async ({ lat, lon }) => {
     const response = await fetch(
-      `${API_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+      `${API_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&lang=${locale.value}&units=metric`
     );
     const data = await response.json();
     const success = data.cod === 200 || data.cod === '200';
@@ -34,7 +36,7 @@ export const useCardsStore = defineStore('cards', () => {
 
   const fetchForecastData = async ({ lat, lon }) => {
     const response = await fetch(
-      `${API_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+      `${API_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&lang=${locale.value}&units=metric`
     );
     const data = await response.json();
     const success = data.cod === 200 || data.cod === '200';
@@ -119,11 +121,12 @@ export const useCardsStore = defineStore('cards', () => {
       groups[date].push(item.main.temp);
     });
 
+    const weekdayLocale = locale.value === 'uk' ? 'uk-UA' : 'en-US';
     return Object.entries(groups)
       .slice(0, 5)
       .map(([date, temps]) => {
         const temp = Math.round(temps.reduce((sum, t) => sum + t, 0) / temps.length);
-        const label = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', {
+        const label = new Date(date + 'T12:00:00Z').toLocaleDateString(weekdayLocale, {
           weekday: 'short',
           timeZone: 'UTC',
         });

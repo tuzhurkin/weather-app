@@ -3,8 +3,7 @@
     <BaseModal class="modal-primary" :name="ModalName.CARDS_LIMIT">
       <template #top>
         <h3 class="title">
-          If you want to add more cards, you need to delete some of them because you have reached
-          the limit of {{ numberOfCards }} cards.
+          {{ translate('modal_cards_limit_title', { cards: numberOfCards }) }}
         </h3>
       </template>
     </BaseModal>
@@ -18,6 +17,7 @@ import { ACTIVE_CARDS_LIMIT, SAVED_CARDS_LIMIT } from '@/constants/config';
 import { storeToRefs } from 'pinia';
 import { useCardsStore } from '@/stores/CardsStore';
 import BaseModal from '@/components/Base/Modal.vue';
+import { useTranslates } from '@/composables/useTranslates';
 
 defineOptions({
   name: 'ModalCardsLimit',
@@ -25,11 +25,10 @@ defineOptions({
 
 const cardsStore = useCardsStore();
 const { currentCardsLimitModal } = storeToRefs(cardsStore);
+const { translate } = useTranslates();
 
 const numberOfCards = computed(() => {
-  return currentCardsLimitModal.value === 'active'
-    ? `${ACTIVE_CARDS_LIMIT} active`
-    : `${SAVED_CARDS_LIMIT} saved`;
+  return currentCardsLimitModal.value === 'active' ? ACTIVE_CARDS_LIMIT : SAVED_CARDS_LIMIT;
 });
 </script>
 

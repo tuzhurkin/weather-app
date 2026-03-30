@@ -2,7 +2,9 @@
   <Transition name="modal">
     <BaseModal class="modal-primary" :name="ModalName.ALREADY_ADDED">
       <template #top>
-        <h3 class="title">The card for {{ activeCard.name }} has already been added.</h3>
+        <h3 class="title">
+          {{ translate('modal_already_added_title', { name: activeCard?.city }) }}
+        </h3>
       </template>
     </BaseModal>
   </Transition>
@@ -13,6 +15,7 @@ import { ModalName } from '@/constants/modal';
 import { storeToRefs } from 'pinia';
 import { useCardsStore } from '@/stores/CardsStore';
 import BaseModal from '@/components/Base/Modal.vue';
+import { useTranslates } from '@/composables/useTranslates';
 
 defineOptions({
   name: 'ModalAlreadyAdded',
@@ -20,6 +23,7 @@ defineOptions({
 
 const cardsStore = useCardsStore();
 const { activeCard } = storeToRefs(cardsStore);
+const { translate } = useTranslates();
 </script>
 
 <style scoped lang="scss">

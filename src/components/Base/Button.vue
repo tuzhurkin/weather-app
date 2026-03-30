@@ -406,7 +406,7 @@ button,
       }
     }
     &:active {
-      transform: scale(0.97);
+      transform: scale(0.88);
       border-color: $color-yellow-hover;
       // background-color: $color-white;
       :deep(.icon) {

@@ -1,0 +1,13 @@
+{
+  "active": "Active",
+  "saved": "Saved",
+  "enter_city_name": "Enter city name",
+  "24h": "24h",
+  "5d": "5d",
+  "modal_cards_limit_title": "If you want to add more cards, you need to delete some of them because you have reached the limit of {{cards}} cards.",
+  "modal_already_added_title": "The card for {{name}} has already been added.",
+  "modal_no_cities_found_title": "City \"{{name}}\" is not found.",
+  "modal_delete_confirm_title": "Are you sure you want to delete this card?",
+  "delete": "Delete",
+  "cancel": "Cancel"
+}

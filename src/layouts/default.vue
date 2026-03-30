@@ -1,13 +1,18 @@
 <template>
   <div class="default-layout">
     <header>
-      <h2>Header</h2>
+      <div class="header-inner">
+        <h2>Header</h2>
+        <LocaleSwitcher />
+      </div>
     </header>
     <main>
       <slot />
     </main>
     <footer>
-      <h2>Footer</h2>
+      <div class="footer-inner">
+        <h2>Footer</h2>
+      </div>
     </footer>
     <ModalGlobal />
   </div>
@@ -15,6 +20,7 @@
 
 <script setup>
 import ModalGlobal from '@/components/Modal/index.vue';
+import LocaleSwitcher from '@/components/LocaleSwitcher/index.vue';
 </script>
 
 <style lang="scss">
@@ -32,6 +38,30 @@ import ModalGlobal from '@/components/Modal/index.vue';
     background-color: #333;
     color: #fff;
     padding: 16px;
+  }
+
+  header {
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  }
+
+  footer {
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
   }
 }
 </style>

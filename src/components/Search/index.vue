@@ -23,6 +23,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import { useLayoutStore } from '@/stores/LayoutStore';
 import { useCardsStore } from '@/stores/CardsStore';
 import { useCitySearch } from '@/composables/useCitySearch';
+import { useTranslates } from '@/composables/useTranslates';
 import BaseSearch from '@/components/Base/Search.vue';
 import BasePreloader from '@/components/Base/Preloader.vue';
 
@@ -34,6 +35,7 @@ const store = useLayoutStore();
 const cardsStore = useCardsStore();
 const { setActiveCitySearchValue } = cardsStore;
 const { query, results, loading } = useCitySearch();
+const { translate } = useTranslates();
 
 const emit = defineEmits(['select']);
 
@@ -43,7 +45,7 @@ const searchData = computed(() => ({
   name: 'search',
   type: 'text',
   autocomplete: 'off',
-  placeholder: 'Enter city name',
+  placeholder: translate('enter_city_name'),
   disabled: false,
 }));
 const open = ref(false);
