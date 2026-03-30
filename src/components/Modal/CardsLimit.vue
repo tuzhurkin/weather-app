@@ -2,9 +2,7 @@
   <Transition name="modal">
     <BaseModal class="modal-primary" :name="ModalName.CARDS_LIMIT">
       <template #top>
-        <h3 class="title">
-          {{ translate('modal_cards_limit_title', { cards: numberOfCards }) }}
-        </h3>
+        <h3 class="title">{{ title }}</h3>
       </template>
     </BaseModal>
   </Transition>
@@ -27,8 +25,10 @@ const cardsStore = useCardsStore();
 const { currentCardsLimitModal } = storeToRefs(cardsStore);
 const { translate } = useTranslates();
 
-const numberOfCards = computed(() => {
-  return currentCardsLimitModal.value === 'active' ? ACTIVE_CARDS_LIMIT : SAVED_CARDS_LIMIT;
+const title = computed(() => {
+  return currentCardsLimitModal.value === 'active'
+    ? translate('modal_active_cards_limit_title', { cards: ACTIVE_CARDS_LIMIT })
+    : translate('modal_saved_cards_limit_title', { cards: SAVED_CARDS_LIMIT });
 });
 </script>
 

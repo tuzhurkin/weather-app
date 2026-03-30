@@ -156,8 +156,8 @@ defineExpose({
     height: max-content;
     margin: auto;
     padding: 50px;
-    border-radius: 10px;
-    border: 1px solid $color-grey-600;
+    border-radius: 20px;
+    // border: 1px solid $color-grey-600;
     background-color: $color-grey-900;
 
     @media (max-width: $sm) {
@@ -212,11 +212,14 @@ defineExpose({
       line-height: 150%;
       letter-spacing: -0.4px;
       text-align: center;
-      text-wrap: balance;
       padding: 0 36px;
 
+      @media (min-width: $sm) {
+        text-wrap: balance;
+      }
+
       @media (max-width: $sm) {
-        padding: 0 8px;
+        padding: 0 32px 0 8px;
         text-align: left;
       }
     }

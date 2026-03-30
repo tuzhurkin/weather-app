@@ -53,7 +53,8 @@ export const useCardsStore = defineStore('cards', () => {
     const dayForecast = get24HoursForecast(forecastData, timezoneOffset);
     const weekForecast = get5DayForecast(forecastData, timezoneOffset);
     // use geo city name as weather API returns imprecise names
-    return buildCard({ ...weatherData, name, local_names: local_names || {} }, lat, lon, dayForecast, weekForecast);
+    const renamedCard = { ...weatherData, name, local_names: local_names || {} };
+    return buildCard(renamedCard, lat, lon, dayForecast, weekForecast);
   };
 
   const requestCityData = async () => {
@@ -199,7 +200,13 @@ export const useCardsStore = defineStore('cards', () => {
       return;
     }
 
-    storedCards.value.unshift({ id: card.id, name: card.city, lat: card.lat, lon: card.lon, local_names: card.local_names || {} });
+    storedCards.value.unshift({
+      id: card.id,
+      name: card.city,
+      lat: card.lat,
+      lon: card.lon,
+      local_names: card.local_names || {},
+    });
     savedCards.value.unshift(card);
   };
 
