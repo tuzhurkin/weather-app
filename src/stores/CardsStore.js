@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
-import { API_KEY, API_URL, ACTIVE_CARDS_LIMIT, SAVED_CARDS_LIMIT } from '@/constants/config';
+import {
+  API_KEY,
+  API_URL,
+  GEO_API_URL,
+  IP_API_URL,
+  ACTIVE_CARDS_LIMIT,
+  SAVED_CARDS_LIMIT,
+} from '@/constants/config';
 import { ModalName } from '@/constants/modal';
 import { useLayoutStore } from '@/stores/LayoutStore';
 import { useRoute } from 'vue-router';
@@ -21,8 +28,49 @@ export const useCardsStore = defineStore('cards', () => {
   const savedCards = ref([]);
   const storedCards = ref([]); // cards written to localStorage in format: [{ id, name, lat, lon }]
 
-  const loading = ref(false);
+  const activeCardsLoading = ref(false);
+  const storedCardsLoading = ref(false);
   const error = ref(null);
+
+  const fetchUserLocation = async () => {
+    const response = await fetch(IP_API_URL);
+    const data = await response.json();
+    return data;
+  };
+
+  const fetchNormalizedUserLocationData = async ({ lat, lon }) => {
+    const response = await fetch(
+      `${GEO_API_URL}/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`
+    );
+    const data = await response.json();
+    return data;
+  };
+
+  const setInitialCard = async () => {
+    activeCardsLoading.value = true;
+    try {
+      // fetch user location from IP API
+      const { latitude: lat, longitude: lon, city } = await fetchUserLocation();
+      if (!lat || !lon || !city) return;
+
+      // reverse geocoding: feed user location from IP API to OpenWeatherMap API to get normalized data
+      const [locationData] = await fetchNormalizedUserLocationData({ lat, lon });
+      if (!locationData) return;
+
+      // fetch and build card using data from OpenWeatherMap API
+      const card = await fetchAndBuildCard({
+        name: locationData.name,
+        lat: locationData.lat,
+        lon: locationData.lon,
+        local_names: locationData.local_names,
+      });
+      addCard({ ...card, isInitial: true });
+    } catch (err) {
+      console.error('Failed to load initial card:', err);
+    } finally {
+      activeCardsLoading.value = false;
+    }
+  };
 
   const fetchWeatherData = async ({ lat, lon }) => {
     const response = await fetch(
@@ -61,7 +109,7 @@ export const useCardsStore = defineStore('cards', () => {
     const city = activeCity.value;
     if (!city?.name || !city?.lat || !city?.lon) return;
 
-    loading.value = true;
+    activeCardsLoading.value = true;
     error.value = null;
     try {
       const card = await fetchAndBuildCard(city);
@@ -70,21 +118,21 @@ export const useCardsStore = defineStore('cards', () => {
       error.value = err.message;
       console.error(err);
     } finally {
-      loading.value = false;
+      activeCardsLoading.value = false;
     }
   };
 
   const fetchStoredCards = async () => {
     if (!storedCards.value.length) return;
 
-    loading.value = true;
+    storedCardsLoading.value = true;
     try {
       const cards = await Promise.all(storedCards.value.map(fetchAndBuildCard));
       savedCards.value = cards;
     } catch (err) {
       console.error('Failed to fetch stored cards:', err);
     } finally {
-      loading.value = false;
+      storedCardsLoading.value = false;
     }
   };
 
@@ -149,6 +197,7 @@ export const useCardsStore = defineStore('cards', () => {
 
   const buildCard = (card, lat, lon, dayForecast = [], weekForecast = []) => {
     return {
+      isInitial: card.isInitial ?? false,
       id: card.id,
       city: card.name,
       local_names: card.local_names || {},
@@ -237,6 +286,9 @@ export const useCardsStore = defineStore('cards', () => {
     return storedCards.value.some(c => c.id === card.id);
   };
 
+  // set the first displayed card based on user ip
+  setInitialCard();
+
   // initialize stored cards from localStorage and fetch fresh data
   const storedCardsData = localStorage.getItem('storedCards');
   if (storedCardsData) {
@@ -261,7 +313,8 @@ export const useCardsStore = defineStore('cards', () => {
     activeCards,
     savedCards,
     storedCards,
-    loading,
+    activeCardsLoading,
+    storedCardsLoading,
     error,
     setCurrentCardsLimitModal,
     setActiveCitySearchValue,

@@ -1,12 +1,12 @@
 <template>
-  <div class="card">
+  <div class="card" :class="{ initial: card.isInitial }">
     <div v-if="isMobile && revealing" class="cover cover--mobile"></div>
     <div class="top">
       <div v-if="!isMobile && revealing" class="cover cover--top"></div>
       <div class="info">
         <div class="location">
           <BaseIcon name="stats/point-low" />
-          <span>{{ localizedCity }}, {{ card.country }}</span>
+          <span class="name">{{ localizedCity }}, {{ card.country }}</span>
         </div>
         <div class="temp-wrap">
           <div class="temp">{{ Math.round(card.temp) }}°C</div>
@@ -502,6 +502,66 @@ onBeforeUnmount(() => {
     }
     to {
       clip-path: inset(100% 0 0 0);
+    }
+  }
+
+  &.initial {
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      border-radius: 50px;
+      background: linear-gradient(
+        90deg,
+        $gradient-color-0 0%,
+        $gradient-color-1 40%,
+        $gradient-color-2 60%,
+        $gradient-color-3 100%
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      pointer-events: none;
+
+      @media (max-width: $sm) {
+        border-radius: 24px;
+      }
+    }
+
+    .location {
+      .icon {
+        :deep(svg) {
+          path[stroke],
+          rect[stroke],
+          circle[stroke] {
+            stroke: $gradient-color-0;
+          }
+          path[fill],
+          rect[fill],
+          circle[fill] {
+            fill: $gradient-color-0;
+          }
+        }
+      }
+      .name {
+        background: linear-gradient(
+          90deg,
+          $gradient-color-0,
+          $gradient-color-1,
+          $gradient-color-2,
+          $gradient-color-3
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+      }
     }
   }
 }

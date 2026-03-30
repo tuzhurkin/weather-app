@@ -203,16 +203,17 @@ defineExpose({
 
     @media (max-width: $sm) {
       max-width: 100%;
+      min-height: 25%;
       padding: 24px 16px;
     }
 
     .title {
+      padding: 0 36px;
       font-weight: 600;
       font-size: 20px;
       line-height: 150%;
       letter-spacing: -0.4px;
       text-align: center;
-      padding: 0 36px;
 
       @media (min-width: $sm) {
         text-wrap: balance;
@@ -220,6 +221,7 @@ defineExpose({
 
       @media (max-width: $sm) {
         padding: 0 32px 0 8px;
+        font-size: 26px;
         text-align: left;
       }
     }

@@ -22,9 +22,12 @@ export const useCitySearch = () => {
     try {
       await sleep(REQUEST_DELAY);
 
-      const res = await fetch(`${GEO_API_URL}?q=${query}&limit=${REQUEST_LIMIT}&appid=${API_KEY}`, {
-        signal: controller.signal,
-      });
+      const res = await fetch(
+        `${GEO_API_URL}/direct?q=${query}&limit=${REQUEST_LIMIT}&appid=${API_KEY}`,
+        {
+          signal: controller.signal,
+        }
+      );
       const data = await res.json();
       results.value = data;
       cache.set(query, data);
