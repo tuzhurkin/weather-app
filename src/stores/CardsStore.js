@@ -17,7 +17,7 @@ export const useCardsStore = defineStore('cards', () => {
   const activeCard = ref(null);
   const activeCards = ref([]);
   const savedCards = ref([]);
-  const storedCards = ref([]); // localStorage items: [{ id, name, lat, lon }]
+  const storedCards = ref([]); // cards written to localStorage in format: [{ id, name, lat, lon }]
 
   const loading = ref(false);
   const error = ref(null);
@@ -47,8 +47,9 @@ export const useCardsStore = defineStore('cards', () => {
       fetchWeatherData({ lat, lon }),
       fetchForecastData({ lat, lon }),
     ]);
-    const dayForecast = get24HoursForecast(forecastData);
-    const weekForecast = get5DayForecast(forecastData);
+    const timezoneOffset = weatherData.timezone; // seconds offset from UTC
+    const dayForecast = get24HoursForecast(forecastData, timezoneOffset);
+    const weekForecast = get5DayForecast(forecastData, timezoneOffset);
     // use geo city name as weather API returns imprecise names
     return buildCard({ ...weatherData, name }, lat, lon, dayForecast, weekForecast);
   };
@@ -84,26 +85,36 @@ export const useCardsStore = defineStore('cards', () => {
     }
   };
 
+  const toLocalHHMM = (utcEpochSeconds, timezoneOffsetSeconds) => {
+    const d = new Date((utcEpochSeconds + timezoneOffsetSeconds) * 1000);
+    return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+  };
+
+  const toLocalDateKey = (utcEpochSeconds, timezoneOffsetSeconds) => {
+    const d = new Date((utcEpochSeconds + timezoneOffsetSeconds) * 1000);
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+  };
+
   // const getTodayForecast = forecastData => {
   //   const today = new Date().toISOString().split('T')[0];
   //   return forecastData.list.filter(item => item.dt_txt.startsWith(today));
   // };
 
-  const get24HoursForecast = forecastData => {
+  const get24HoursForecast = (forecastData, timezoneOffset) => {
     const now = Date.now() / 1000;
     const in24h = now + 86400; // 24 hours in seconds
     return forecastData.list
       .filter(item => item.dt >= now && item.dt <= in24h)
       .map(item => ({
-        label: item.dt_txt.split(' ')[1].slice(0, 5),
+        label: toLocalHHMM(item.dt, timezoneOffset),
         temp: Math.round(item.main.temp),
       }));
   };
 
-  const get5DayForecast = forecastData => {
+  const get5DayForecast = (forecastData, timezoneOffset) => {
     const groups = {};
     forecastData.list.forEach(item => {
-      const date = item.dt_txt.split(' ')[0];
+      const date = toLocalDateKey(item.dt, timezoneOffset);
       if (!groups[date]) groups[date] = [];
       groups[date].push(item.main.temp);
     });
@@ -112,7 +123,10 @@ export const useCardsStore = defineStore('cards', () => {
       .slice(0, 5)
       .map(([date, temps]) => {
         const temp = Math.round(temps.reduce((sum, t) => sum + t, 0) / temps.length);
-        const label = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+        const label = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', {
+          weekday: 'short',
+          timeZone: 'UTC',
+        });
         return { label, temp };
       });
   };
@@ -148,6 +162,7 @@ export const useCardsStore = defineStore('cards', () => {
       title: card.weather[0].main,
       description: card.weather[0].description,
       icon: card.weather[0].icon,
+      timezoneOffset: card.timezone,
       lat,
       lon,
       dayForecast,

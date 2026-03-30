@@ -10,8 +10,12 @@
         </div>
         <div class="temp-wrap">
           <div class="temp">{{ Math.round(card.temp) }}°C</div>
-          <div v-if="!isMobile" class="feels-like">
+          <!-- <div v-if="!isMobile" class="feels-like">
             feels like: <span>{{ Math.round(card.feels_like) }}°C</span>
+          </div> -->
+          <div class="local-time">
+            <BaseIcon name="clock" />
+            <span>{{ localTime }}</span>
           </div>
         </div>
       </div>
@@ -42,7 +46,7 @@
     <div class="chart">
       <div v-if="!isMobile && revealing" class="cover cover--chart"></div>
       <CardForecast :forecast="card.dayForecast" />
-      <!-- <CardForecast :forecast="card.weekForecast" /> -->
+      <CardForecast :forecast="card.weekForecast" />
     </div>
   </div>
 </template>
@@ -90,17 +94,36 @@ const onDeleteClick = () => {
   store.SHOW_Modal(ModalName.DELETE_CONFIRM);
 };
 
+// local time clock
+const localTime = ref('');
+let clockTimer = null;
+
+const updateLocalTime = () => {
+  const offset = props.card.timezoneOffset ?? 0;
+  const d = new Date((Date.now() / 1000 + offset) * 1000);
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const mo = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = d.getUTCFullYear();
+  localTime.value = `${hh}:${mm} ${dd}/${mo}/${yyyy}`;
+};
+
 // reveal cover animation
 const revealing = ref(true);
 let cleanupTimer = null;
 
 onMounted(() => {
+  updateLocalTime();
+  clockTimer = setInterval(updateLocalTime, 10000);
+
   cleanupTimer = setTimeout(() => {
     revealing.value = false;
   }, 2000);
 });
 
 onBeforeUnmount(() => {
+  clearInterval(clockTimer);
   clearTimeout(cleanupTimer);
 });
 </script>
@@ -187,6 +210,10 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    @media (max-width: $sm) {
+      align-items: center;
+    }
   }
 
   .temp {
@@ -195,20 +222,26 @@ onBeforeUnmount(() => {
     line-height: 100%;
   }
 
-  .feels-like {
+  .feels-like,
+  .local-time {
     display: flex;
     justify-content: center;
     align-items: center;
-    column-gap: 4px;
+    column-gap: 8px;
     min-height: 36px;
     padding: 0 16px;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 120%;
     text-align: center;
     border-radius: 50px;
     color: $color-grey-300;
     background-color: $color-grey-750;
+
+    :deep(.icon) {
+      width: 20px;
+      height: 20px;
+    }
 
     span {
       color: $color-grey-200;
