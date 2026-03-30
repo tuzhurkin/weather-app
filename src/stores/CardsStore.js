@@ -44,7 +44,7 @@ export const useCardsStore = defineStore('cards', () => {
     return data;
   };
 
-  const fetchAndBuildCard = async ({ name, lat, lon }) => {
+  const fetchAndBuildCard = async ({ name, lat, lon, local_names }) => {
     const [weatherData, forecastData] = await Promise.all([
       fetchWeatherData({ lat, lon }),
       fetchForecastData({ lat, lon }),
@@ -53,7 +53,7 @@ export const useCardsStore = defineStore('cards', () => {
     const dayForecast = get24HoursForecast(forecastData, timezoneOffset);
     const weekForecast = get5DayForecast(forecastData, timezoneOffset);
     // use geo city name as weather API returns imprecise names
-    return buildCard({ ...weatherData, name }, lat, lon, dayForecast, weekForecast);
+    return buildCard({ ...weatherData, name, local_names: local_names || {} }, lat, lon, dayForecast, weekForecast);
   };
 
   const requestCityData = async () => {
@@ -121,16 +121,11 @@ export const useCardsStore = defineStore('cards', () => {
       groups[date].push(item.main.temp);
     });
 
-    const weekdayLocale = locale.value === 'uk' ? 'uk-UA' : 'en-US';
     return Object.entries(groups)
       .slice(0, 5)
       .map(([date, temps]) => {
         const temp = Math.round(temps.reduce((sum, t) => sum + t, 0) / temps.length);
-        const label = new Date(date + 'T12:00:00Z').toLocaleDateString(weekdayLocale, {
-          weekday: 'short',
-          timeZone: 'UTC',
-        });
-        return { label, temp };
+        return { date, temp };
       });
   };
 
@@ -155,6 +150,7 @@ export const useCardsStore = defineStore('cards', () => {
     return {
       id: card.id,
       city: card.name,
+      local_names: card.local_names || {},
       country: card.sys.country,
       temp: card.main.temp,
       temp_min: card.main.temp_min,
@@ -203,7 +199,7 @@ export const useCardsStore = defineStore('cards', () => {
       return;
     }
 
-    storedCards.value.unshift({ id: card.id, name: card.city, lat: card.lat, lon: card.lon });
+    storedCards.value.unshift({ id: card.id, name: card.city, lat: card.lat, lon: card.lon, local_names: card.local_names || {} });
     savedCards.value.unshift(card);
   };
 

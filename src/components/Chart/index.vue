@@ -110,7 +110,8 @@ const renderChart = () => {
   });
 };
 
-watch(() => chartData, renderChart);
+watch(chartData, renderChart, { deep: true });
+watch(isMobile, renderChart);
 
 onMounted(renderChart);
 

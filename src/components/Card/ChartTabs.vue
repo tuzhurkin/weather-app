@@ -16,22 +16,23 @@
       <CardForecast :forecast="card.dayForecast" />
     </div>
     <div class="panel" :class="{ active: activeTab === 'week' }" :style="{ position: weekPos }">
-      <CardForecast :forecast="card.weekForecast" />
+      <CardForecast :forecast="localizedWeekForecast" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import BaseButton from '@/components/Base/Button.vue';
 import CardForecast from '@/components/Card/Forecast.vue';
 import { useTranslates } from '@/composables/useTranslates';
+import { useLocale } from '@/composables/useLocale';
 
 defineOptions({
   name: 'CardChartTabs',
 });
 
-defineProps({
+const props = defineProps({
   card: {
     type: Object,
     default: () => ({}),
@@ -39,6 +40,18 @@ defineProps({
 });
 
 const { translate } = useTranslates();
+const { locale } = useLocale();
+
+const localizedWeekForecast = computed(() => {
+  const weekdayLocale = locale.value === 'uk' ? 'uk-UA' : 'en-US';
+  return props.card.weekForecast?.map(item => ({
+    label: new Date(item.date + 'T12:00:00Z').toLocaleDateString(weekdayLocale, {
+      weekday: 'short',
+      timeZone: 'UTC',
+    }),
+    temp: item.temp,
+  })) ?? [];
+});
 
 const TAB_DURATION = 500;
 const activeTab = ref('day');

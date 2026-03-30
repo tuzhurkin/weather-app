@@ -4,7 +4,7 @@
     <div v-show="isResultsVisible" v-on-click-outside="onClickOutside" class="results-box">
       <ul v-if="!loading" class="results">
         <li v-for="result in results" :key="result.id" @click="selectCity(result)" class="result">
-          <span class="name">{{ result.name }}, </span>
+          <span class="name">{{ result.local_names?.[locale] || result.name }}, </span>
           <span class="country">{{ result.country }} </span>
           <span v-if="result.state" class="state"> ({{ result.state }})</span>
         </li>
@@ -24,6 +24,7 @@ import { useLayoutStore } from '@/stores/LayoutStore';
 import { useCardsStore } from '@/stores/CardsStore';
 import { useCitySearch } from '@/composables/useCitySearch';
 import { useTranslates } from '@/composables/useTranslates';
+import { useLocale } from '@/composables/useLocale';
 import BaseSearch from '@/components/Base/Search.vue';
 import BasePreloader from '@/components/Base/Preloader.vue';
 
@@ -36,6 +37,7 @@ const cardsStore = useCardsStore();
 const { setActiveCitySearchValue } = cardsStore;
 const { query, results, loading } = useCitySearch();
 const { translate } = useTranslates();
+const { locale } = useLocale();
 
 const emit = defineEmits(['select']);
 

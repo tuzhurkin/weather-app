@@ -6,7 +6,7 @@
       <div class="info">
         <div class="location">
           <BaseIcon name="stats/point-low" />
-          <span>{{ card.city }}, {{ card.country }}</span>
+          <span>{{ localizedCity }}, {{ card.country }}</span>
         </div>
         <div class="temp-wrap">
           <div class="temp">{{ Math.round(card.temp) }}°C</div>
@@ -20,7 +20,7 @@
     <div class="middle">
       <div v-if="!isMobile && revealing" class="cover cover--middle"></div>
       <BaseIcon :name="icon" class="condition" />
-      <div class="title">{{ card.title }}</div>
+      <div class="title">{{ localizedTitle }}</div>
     </div>
     <div class="bottom">
       <div v-if="!isMobile && revealing" class="cover cover--bottom"></div>
@@ -52,6 +52,7 @@ import { storeToRefs } from 'pinia';
 import { ModalName } from '@/constants/modal';
 import { useLayoutStore } from '@/stores/LayoutStore';
 import { useCardsStore } from '@/stores/CardsStore';
+import { useLocale } from '@/composables/useLocale';
 import BaseIcon from '@/components/Base/Icon.vue';
 import BaseButton from '@/components/Base/Button.vue';
 import CardStat from '@/components/Card/Stat.vue';
@@ -72,8 +73,15 @@ const store = useLayoutStore();
 const cardsStore = useCardsStore();
 const { isPageSaved } = storeToRefs(cardsStore);
 const { saveCard, unsaveCard, setActiveCard, isCardSaved } = cardsStore;
+const { locale } = useLocale();
 
 const isMobile = computed(() => store.IS_Mobile);
+
+const isLocaleEn = computed(() => locale.value === 'en');
+const localizedCity = computed(() => props.card.local_names?.[locale.value] || props.card.city);
+const localizedTitle = computed(() =>
+  isLocaleEn.value ? props.card.title : props.card.description
+);
 
 const icon = computed(() => {
   return `conditions/${CONDITIONS[props.card.icon]}`;
