@@ -39,12 +39,21 @@ const icon = computed(() => {
   .icon {
     width: 28px;
     height: 28px;
+
+    @media (max-width: $sm) {
+      width: 32px;
+      height: 32px;
+    }
   }
 
   .value {
     font-weight: 500;
     font-size: 20px;
     line-height: 150%;
+
+    @media (max-width: $sm) {
+      font-size: 24px;
+    }
   }
 }
 </style>

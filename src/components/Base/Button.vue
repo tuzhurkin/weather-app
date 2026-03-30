@@ -150,13 +150,13 @@ button,
       rect[stroke],
       circle[stroke] {
         transition: stroke $transition ease;
-        stroke: $color-white;
+        stroke: $color-yellow;
       }
       path[fill],
       rect[fill],
       circle[fill] {
         transition: fill $transition ease;
-        fill: $color-white;
+        fill: $color-yellow;
       }
     }
     @include hover {

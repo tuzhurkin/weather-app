@@ -25,10 +25,6 @@ defineOptions({
   background-color: $color-grey-600;
   border-radius: 12px;
 
-  @media (max-width: $sm) {
-    width: 100%;
-  }
-
   :deep(.btn) {
     min-height: 36px;
     padding: 0 32px;

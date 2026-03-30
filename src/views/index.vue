@@ -26,5 +26,10 @@ defineOptions({
   width: 100%;
   max-width: 1200px;
   margin: 32px auto;
+
+  @media (max-width: $sm) {
+    margin: 16px auto;
+    padding: 0 16px;
+  }
 }
 </style>

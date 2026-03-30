@@ -12,7 +12,12 @@
       @focus="focus"
       @blur="blur"
     />
-    <BaseButton type="icony" icon="magnifer" :disabled="!modelValue" @click="onSearchButtonClick" />
+    <BaseButton
+      type="primary yellow"
+      icon="magnifer"
+      :disabled="!modelValue"
+      @click="onSearchButtonClick"
+    />
   </label>
 </template>
 
@@ -110,16 +115,14 @@ watch(
   :deep(.btn) {
     width: 56px;
     height: 56px;
+    padding: 0;
     border-radius: 50px;
-    border-color: $color-yellow;
-    transition: border-color $transition ease;
 
     .icon {
-      path[stroke] {
-        stroke: $color-yellow;
-      }
-      path[fill] {
-        fill: $color-yellow;
+      path,
+      rect,
+      circle {
+        stroke-width: 2;
       }
     }
   }

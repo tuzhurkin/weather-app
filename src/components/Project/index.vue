@@ -12,19 +12,17 @@ defineOptions({
 
 <style scoped lang="scss">
 .project {
-  max-width: 1200px;
-  margin: 32px auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
+  max-width: 1200px;
+  min-width: 360px;
+  margin: 32px auto;
   min-height: 360px;
   padding: 32px;
-  border: 1px solid $color-grey-500;
-  border-radius: 16px;
 
-  .project-search {
-    width: 50%;
-    margin: 0 auto;
+  @media (max-width: $sm) {
+    padding: 16px;
   }
 }
 </style>

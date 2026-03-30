@@ -102,8 +102,16 @@ defineExpose({
 .modal-leave-to {
   opacity: 0;
 
+  @media (max-width: $sm) {
+    opacity: 1;
+  }
+
   .modal-inner {
     transform: translate(0, 20px);
+
+    @media (max-width: $sm) {
+      transform: translate(0, 100%);
+    }
   }
 }
 
@@ -118,12 +126,13 @@ defineExpose({
   padding: 16px 0;
   display: flex;
   justify-content: center;
-  background-color: rgba(#0e0e0e, 0.75);
+  background-color: rgba(#0e0e0e, 0.9);
   overflow: auto;
 
   @media (max-width: $sm) {
-    padding: 36px 16px;
+    padding: 0;
     height: var(--windowHeight);
+    overflow: hidden;
   }
 
   &.scrolly {
@@ -155,6 +164,8 @@ defineExpose({
       max-width: 100%;
       margin-bottom: 0;
       padding: 24px 16px;
+      border-radius: 32px 32px 0 0;
+      border: none;
     }
 
     .modal-top {
@@ -181,6 +192,39 @@ defineExpose({
     :deep(.icon) {
       width: 32px;
       height: 32px;
+    }
+  }
+}
+
+.modal-primary {
+  :deep(.modal-inner) {
+    max-width: 32%;
+    padding: 32px;
+
+    @media (max-width: $sm) {
+      max-width: 100%;
+      padding: 24px 16px;
+    }
+
+    .title {
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 150%;
+      letter-spacing: -0.4px;
+      text-align: center;
+      text-wrap: balance;
+      padding: 0 36px;
+
+      @media (max-width: $sm) {
+        padding: 0 8px;
+        text-align: left;
+      }
+    }
+  }
+
+  .modal-close {
+    @media (max-width: $sm) {
+      top: 24px;
     }
   }
 }

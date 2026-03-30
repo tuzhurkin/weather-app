@@ -1,7 +1,8 @@
 <template>
   <div class="card">
+    <div v-if="isMobile" class="cover cover--mobile"></div>
     <div class="top">
-      <div class="cover cover--top"></div>
+      <div v-if="!isMobile" class="cover cover--top"></div>
       <div class="info">
         <div class="location">
           <BaseIcon name="stats/point-low" />
@@ -9,19 +10,19 @@
         </div>
         <div class="temp-wrap">
           <div class="temp">{{ Math.round(card.temp) }}°C</div>
-          <div class="feels-like">
+          <div v-if="!isMobile" class="feels-like">
             feels like: <span>{{ Math.round(card.feels_like) }}°C</span>
           </div>
         </div>
       </div>
     </div>
     <div class="middle">
-      <div class="cover cover--middle"></div>
+      <div v-if="!isMobile" class="cover cover--middle"></div>
       <BaseIcon :name="icon" class="condition" />
       <div class="title">{{ card.title }}</div>
     </div>
     <div class="bottom">
-      <div class="cover cover--bottom"></div>
+      <div v-if="!isMobile" class="cover cover--bottom"></div>
       <div class="stats">
         <CardStat name="temp_max" :value="Math.round(card.temp_max) + '°C'" />
         <CardStat name="temp_min" :value="Math.round(card.temp_min) + '°C'" />
@@ -39,9 +40,9 @@
       <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="onDeleteClick" />
     </div>
     <div class="chart">
-      <div class="cover cover--chart"></div>
-      <!-- <CardForecast :forecast="card.dayForecast" /> -->
-      <CardForecast :forecast="card.weekForecast" />
+      <div v-if="!isMobile" class="cover cover--chart"></div>
+      <CardForecast :forecast="card.dayForecast" />
+      <!-- <CardForecast :forecast="card.weekForecast" /> -->
     </div>
   </div>
 </template>
@@ -73,6 +74,8 @@ const store = useLayoutStore();
 const cardsStore = useCardsStore();
 const { savedCards, isPageSaved } = storeToRefs(cardsStore);
 const { saveCard, unsaveCard, setActiveCard } = cardsStore;
+
+const isMobile = computed(() => store.IS_Mobile);
 
 const icon = computed(() => {
   return `conditions/${CONDITIONS[props.card.icon]}`;
@@ -110,10 +113,23 @@ const onDeleteClick = () => {
   border-radius: 50px;
   background: linear-gradient(150deg, $color-grey-600 0%, $color-grey-750 105%);
 
+  @media (max-width: $sm) {
+    display: flex;
+    flex-direction: column;
+    row-gap: 24px;
+    padding: 24px 16px;
+    border-radius: 24px;
+  }
+
   .condition {
     position: relative;
     width: 120px;
     height: 120px;
+
+    @media (max-width: $sm) {
+      width: 150px;
+      height: 150px;
+    }
 
     :deep(svg) {
       position: absolute;
@@ -135,6 +151,12 @@ const onDeleteClick = () => {
     line-height: 150%;
     letter-spacing: 0.01em;
     text-align: center;
+
+    @media (max-width: $sm) {
+      font-weight: 600;
+      font-size: 28px;
+      line-height: 150%;
+    }
   }
 
   .location {
@@ -196,6 +218,12 @@ const onDeleteClick = () => {
       flex-direction: column;
       align-items: flex-start;
       gap: 12px;
+
+      @media (max-width: $sm) {
+        align-items: center;
+        gap: 24px;
+        width: 100%;
+      }
     }
   }
 
@@ -204,6 +232,7 @@ const onDeleteClick = () => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: center;
     gap: 12px;
   }
 
@@ -213,105 +242,38 @@ const onDeleteClick = () => {
     justify-content: flex-end;
     padding-right: 16px;
 
+    @media (max-width: $sm) {
+      justify-content: center;
+      padding-right: 0;
+    }
+
     .stats {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       gap: 12px;
       padding: 4px 0;
+
+      @media (max-width: $sm) {
+        display: block;
+        column-count: 2;
+        column-gap: 8px;
+        width: 100%;
+        padding: 0;
+        margin-top: 16px;
+      }
+
+      .stat {
+        @media (max-width: $sm) {
+          margin-bottom: 16px;
+        }
+      }
     }
   }
 
   .chart {
     position: relative;
     grid-column: 1 / -1;
-  }
-
-  // >>> reveal cover animation <<<
-  $gradient-color-0: #e8960a;
-  $gradient-color-1: $color-yellow;
-  $gradient-color-2: $color-yellow-hover;
-  $gradient-color-3: #f7d070;
-
-  .cover {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    animation-fill-mode: both;
-
-    &--top {
-      top: -32px;
-      left: -100px;
-      right: 36px;
-      bottom: -32px;
-      z-index: 10;
-      background: linear-gradient(90deg, $gradient-color-0 0%, $gradient-color-1 100%);
-      animation-name: section-cover-reveal;
-      animation-duration: 0.5s;
-      animation-delay: 0.1s;
-    }
-
-    &--middle {
-      top: -32px;
-      left: -52px;
-      right: -52px;
-      bottom: -32px;
-      z-index: 10;
-      background: linear-gradient(90deg, $gradient-color-1 0%, $gradient-color-2 100%);
-      animation-name: section-cover-reveal;
-      animation-duration: 0.5s;
-      animation-delay: 0.3s;
-    }
-
-    &--bottom {
-      top: -32px;
-      left: 36px;
-      right: -100px;
-      bottom: -32px;
-      z-index: 10;
-      background: linear-gradient(90deg, $gradient-color-2 0%, $gradient-color-3 100%);
-      animation-name: section-cover-reveal;
-      animation-duration: 0.5s;
-      animation-delay: 0.5s;
-    }
-
-    &--chart {
-      top: -32px;
-      bottom: -32px;
-      left: -100px;
-      right: -100px;
-      z-index: 10;
-      border-radius: 0 0 44px 44px;
-      background: linear-gradient(
-        90deg,
-        $gradient-color-0 0%,
-        $gradient-color-1 40%,
-        $gradient-color-2 60%,
-        $gradient-color-3 100%
-      );
-      animation-name: chart-cover-reveal;
-      animation-duration: 0.5s;
-      animation-delay: 0.7s;
-    }
-  }
-
-  @keyframes section-cover-reveal {
-    from {
-      clip-path: inset(0 0 0 0);
-    }
-    to {
-      clip-path: inset(0 0 100% 0);
-    }
-  }
-
-  @keyframes chart-cover-reveal {
-    from {
-      clip-path: inset(0 0 0 0);
-    }
-    to {
-      clip-path: inset(100% 0 0 0);
-    }
   }
 
   .controls {
@@ -330,6 +292,16 @@ const onDeleteClick = () => {
     transition: opacity $transition ease;
 
     &.shown {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: $sm) {
+      justify-content: flex-start;
+      gap: 24px;
+      top: 16px;
+      right: 16px;
+
       opacity: 1;
       pointer-events: auto;
     }
@@ -385,6 +357,106 @@ const onDeleteClick = () => {
     .controls {
       opacity: 1;
       pointer-events: auto;
+    }
+  }
+
+  // >>> reveal cover animation <<<
+  $gradient-color-0: #e8960a;
+  $gradient-color-1: $color-yellow;
+  $gradient-color-2: $color-yellow-hover;
+  $gradient-color-3: #f7d070;
+
+  .cover {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+
+    &--top {
+      top: -32px;
+      left: -100px;
+      right: 20px; // 36px;
+      bottom: -32px;
+      z-index: 10;
+      background: linear-gradient(90deg, $gradient-color-0 0%, $gradient-color-1 100%);
+      animation-name: section-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.1s;
+    }
+
+    &--middle {
+      top: -32px;
+      left: -52px;
+      right: -68px; // -52px;
+      bottom: -32px;
+      z-index: 10;
+      background: linear-gradient(90deg, $gradient-color-1 0%, $gradient-color-2 100%);
+      animation-name: section-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.3s;
+    }
+
+    &--bottom {
+      top: -32px;
+      left: 36px;
+      right: -100px;
+      bottom: -32px;
+      z-index: 10;
+      background: linear-gradient(90deg, $gradient-color-2 0%, $gradient-color-3 100%);
+      animation-name: section-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.5s;
+    }
+
+    &--chart {
+      top: -32px;
+      bottom: -32px;
+      left: -100px;
+      right: -100px;
+      z-index: 10;
+      background: linear-gradient(
+        90deg,
+        $gradient-color-0 0%,
+        $gradient-color-1 40%,
+        $gradient-color-2 60%,
+        $gradient-color-3 100%
+      );
+      animation-name: chart-cover-reveal;
+      animation-duration: 0.5s;
+      animation-delay: 0.7s;
+    }
+
+    &--mobile {
+      z-index: 10;
+      background: linear-gradient(
+        90deg,
+        $gradient-color-0 0%,
+        $gradient-color-1 40%,
+        $gradient-color-2 60%,
+        $gradient-color-3 100%
+      );
+      animation-name: chart-cover-reveal;
+      animation-duration: 0.8s;
+      animation-delay: 0.3s;
+    }
+  }
+
+  @keyframes section-cover-reveal {
+    from {
+      clip-path: inset(0 0 0 0);
+    }
+    to {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+
+  @keyframes chart-cover-reveal {
+    from {
+      clip-path: inset(0 0 0 0);
+    }
+    to {
+      clip-path: inset(100% 0 0 0);
     }
   }
 }

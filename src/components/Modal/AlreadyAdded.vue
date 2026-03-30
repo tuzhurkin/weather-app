@@ -2,7 +2,7 @@
   <Transition name="modal">
     <BaseModal class="modal-primary" :name="ModalName.ALREADY_ADDED">
       <template #top>
-        <h3 class="title">The {{ activeCard.city }} card has already been added.</h3>
+        <h3 class="title">The card for {{ activeCard.name }} has already been added.</h3>
       </template>
     </BaseModal>
   </Transition>
@@ -25,25 +25,8 @@ const { activeCard } = storeToRefs(cardsStore);
 <style scoped lang="scss">
 .modal-primary {
   :deep(.modal-inner) {
-    max-width: 32%;
-    padding: 32px;
-
-    @media (max-width: $sm) {
-      max-width: 100%;
-    }
-
     .modal-top {
       margin-bottom: 0;
-    }
-
-    .title {
-      font-weight: 600;
-      font-size: 20px;
-      line-height: 150%;
-      letter-spacing: -0.4px;
-      text-align: center;
-      text-wrap: balance;
-      padding: 0 36px;
     }
   }
 }

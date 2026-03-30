@@ -1,5 +1,5 @@
 <template>
-  <h1>Active</h1>
+  <!-- <h1>Active</h1> -->
   <div class="project-search">
     <Search @select="onSearch" />
   </div>
@@ -25,5 +25,9 @@ const { onSearch } = cardsStore;
 .project-search {
   width: 50%;
   margin: 0 auto;
+
+  @media (max-width: $sm) {
+    width: 100%;
+  }
 }
 </style>

@@ -5,6 +5,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip } from 'chart.js';
+import { useLayoutStore } from '@/stores/LayoutStore';
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
@@ -14,6 +15,9 @@ const props = defineProps({
     required: true,
   },
 });
+
+const store = useLayoutStore();
+const isMobile = computed(() => store.IS_Mobile);
 
 const chartData = computed(() => props.chartData);
 const chartRef = ref(null);
@@ -47,7 +51,7 @@ const renderChart = () => {
         {
           data: temps,
           backgroundColor: temps.map(getBarColor),
-          borderRadius: 16,
+          borderRadius: !isMobile.value ? 16 : 8,
           barPercentage: 1.2,
         },
       ],
@@ -59,13 +63,13 @@ const renderChart = () => {
           backgroundColor: '#1e1e1e',
           padding: 10,
           titleFont: {
-            size: 16,
+            size: !isMobile.value ? 16 : 12,
             weight: 500,
             family: 'Figtree, sans-serif',
           },
           titleColor: '#dddddd',
           bodyFont: {
-            size: 16,
+            size: !isMobile.value ? 16 : 12,
             weight: 500,
             family: 'Figtree, sans-serif',
           },
@@ -81,7 +85,7 @@ const renderChart = () => {
           border: { color: '#dddddd' },
           ticks: {
             font: {
-              size: 16,
+              size: !isMobile.value ? 16 : 12,
               weight: 500,
               family: 'Figtree, sans-serif',
             },
@@ -93,7 +97,7 @@ const renderChart = () => {
           border: { color: '#dddddd' },
           ticks: {
             font: {
-              size: 16,
+              size: !isMobile.value ? 16 : 12,
               weight: 500,
               family: 'Figtree, sans-serif',
             },
