@@ -1,9 +1,14 @@
 <template>
-  <div class="search-autocomplete">
+  <div class="search-autocomplete" @keydown="onKeydown">
     <BaseSearch v-bind="searchData" v-model="query" @focus="onFocus" @search="onSearch" />
     <div v-show="isResultsVisible" v-on-click-outside="onClickOutside" class="results-box">
       <ul v-if="!loading" class="results">
-        <li v-for="result in results" :key="result.id" @click="selectCity(result)" class="result">
+        <li
+          v-for="(result, index) in results"
+          :key="result.id"
+          :class="['result', { active: activeIndex === index }]"
+          @click="selectCity(result)"
+        >
           <span class="name">{{ result.local_names?.[locale] || result.name }}, </span>
           <span class="country">{{ result.country }} </span>
           <span v-if="result.state" class="state"> ({{ result.state }})</span>
@@ -51,15 +56,18 @@ const searchData = computed(() => ({
   disabled: false,
 }));
 const open = ref(false);
+const activeIndex = ref(-1);
 const isResultsVisible = computed(() => results.value.length > 0 && open.value);
 
 watch(results, value => {
   open.value = Boolean(value.length);
+  activeIndex.value = -1;
 });
 
 const selectCity = city => {
   emit('select', city);
   open.value = false;
+  activeIndex.value = -1;
 };
 
 const onFocus = () => {
@@ -73,14 +81,30 @@ const onSearch = value => {
     return;
   }
 
-  const city = results.value[0];
+  const city = activeIndex.value >= 0 ? results.value[activeIndex.value] : results.value[0];
   emit('select', city);
   open.value = false;
+  activeIndex.value = -1;
+};
+
+const onKeydown = e => {
+  if (e.key === 'ArrowDown' && isResultsVisible.value) {
+    e.preventDefault();
+    activeIndex.value = Math.min(activeIndex.value + 1, results.value.length - 1);
+  } else if (e.key === 'ArrowUp' && isResultsVisible.value) {
+    e.preventDefault();
+    activeIndex.value = Math.max(activeIndex.value - 1, -1);
+  } else if (e.key === 'Enter') {
+    onSearch(query.value);
+  }
 };
 
 const onClickOutside = e => {
   if (e.target.closest('.search')) return;
-  if (open.value) open.value = false;
+  if (open.value) {
+    open.value = false;
+    activeIndex.value = -1;
+  }
 };
 </script>
 
@@ -112,6 +136,10 @@ const onClickOutside = e => {
         @include noTap;
 
         @include hover {
+          background-color: $color-grey-600;
+        }
+
+        &.active {
           background-color: $color-grey-600;
         }
 
