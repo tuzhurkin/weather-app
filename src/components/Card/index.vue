@@ -43,10 +43,34 @@
       />
       <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="onDeleteClick" />
     </div>
-    <div class="chart">
+    <div class="tabs">
+      <BaseButton
+        :type="activeTab === 'day' ? 'primary yellow' : 'primary'"
+        text="24h"
+        @click="setTab('day')"
+      />
+      <BaseButton
+        :type="activeTab === 'week' ? 'primary yellow' : 'primary'"
+        text="5d"
+        @click="setTab('week')"
+      />
+    </div>
+    <div class="chart" :class="tabDirection && `chart--${tabDirection}`">
       <div v-if="!isMobile && revealing" class="cover cover--chart"></div>
-      <CardForecast :forecast="card.dayForecast" />
-      <CardForecast :forecast="card.weekForecast" />
+      <div
+        class="chart-panel"
+        :class="{ active: activeTab === 'day' }"
+        :style="{ position: dayPos }"
+      >
+        <CardForecast :forecast="card.dayForecast" />
+      </div>
+      <div
+        class="chart-panel"
+        :class="{ active: activeTab === 'week' }"
+        :style="{ position: weekPos }"
+      >
+        <CardForecast :forecast="card.weekForecast" />
+      </div>
     </div>
   </div>
 </template>
@@ -94,6 +118,41 @@ const onDeleteClick = () => {
   store.SHOW_Modal(ModalName.DELETE_CONFIRM);
 };
 
+// forecast tab logic
+const TAB_DURATION = 500; // 300;
+const activeTab = ref('day');
+const tabDirection = ref(null);
+const dayPos = ref('relative');
+const weekPos = ref('absolute');
+let switchTimer = null;
+
+const setTab = tab => {
+  if (tab === activeTab.value) return;
+  clearTimeout(switchTimer);
+
+  tabDirection.value = tab === 'week' ? 'next' : 'prev';
+  activeTab.value = tab;
+
+  if (tab === 'week') {
+    weekPos.value = 'absolute'; // enters: floats during delay so it doesn't affect height
+    dayPos.value = 'relative'; // exits:  holds height while sliding out
+  } else {
+    dayPos.value = 'absolute';
+    weekPos.value = 'relative';
+  }
+
+  switchTimer = setTimeout(() => {
+    // entering panel takes over the flow, exiting panel leaves it
+    if (tab === 'week') {
+      weekPos.value = 'relative';
+      dayPos.value = 'absolute';
+    } else {
+      dayPos.value = 'relative';
+      weekPos.value = 'absolute';
+    }
+  }, TAB_DURATION);
+};
+
 // local time clock
 const localTime = ref('');
 let clockTimer = null;
@@ -125,6 +184,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(clockTimer);
   clearTimeout(cleanupTimer);
+  clearTimeout(switchTimer);
 });
 </script>
 
@@ -315,6 +375,19 @@ onBeforeUnmount(() => {
     grid-column: 1 / -1;
   }
 
+  .tabs {
+    grid-column: 1 / -1;
+    display: flex;
+    // justify-content: center;
+    align-items: center;
+    column-gap: 8px;
+
+    :deep(.btn) {
+      min-width: 50px;
+      padding: 0;
+    }
+  }
+
   .controls {
     display: flex;
     flex-direction: column;
@@ -399,6 +472,78 @@ onBeforeUnmount(() => {
     }
   }
 
+  // >>> tab switch animation <<<
+  $tab-dur: 500ms;
+
+  .chart-panel {
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity $tab-dur $easeIn-1;
+
+    &.active {
+      pointer-events: all;
+      opacity: 1;
+      transition: opacity $tab-dur $easeOut-1 $tab-dur;
+    }
+  }
+
+  .chart--next {
+    .chart-panel {
+      animation: chartSlideOutLeft $tab-dur $easeIn-1;
+      &.active {
+        animation: chartSlideInRight $tab-dur $easeOut-1 $tab-dur;
+      }
+    }
+  }
+
+  .chart--prev {
+    .chart-panel {
+      animation: chartSlideOutRight $tab-dur $easeIn-1;
+      &.active {
+        animation: chartSlideInLeft $tab-dur $easeOut-1 $tab-dur;
+      }
+    }
+  }
+
+  @keyframes chartSlideInRight {
+    from {
+      transform: translateX(20%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes chartSlideOutLeft {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-20%);
+    }
+  }
+
+  @keyframes chartSlideInLeft {
+    from {
+      transform: translateX(-20%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes chartSlideOutRight {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(20%);
+    }
+  }
+
   // >>> reveal cover animation <<<
   $gradient-color-0: #e8960a;
   $gradient-color-1: $color-yellow;
@@ -449,7 +594,7 @@ onBeforeUnmount(() => {
     }
 
     &--chart {
-      top: -32px;
+      top: -100px; // = 32px gap + 50px tabs height + 18px buffer
       bottom: -32px;
       left: -100px;
       right: -100px;

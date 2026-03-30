@@ -50,6 +50,7 @@ const icon = computed(() => {
     font-weight: 500;
     font-size: 20px;
     line-height: 150%;
+    @include textOverflow(1);
 
     @media (max-width: $sm) {
       font-size: 24px;

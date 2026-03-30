@@ -30,3 +30,6 @@ $color-error-dark: #491215;
 
 $main-font: 'Figtree', sans-serif;
 $transition: 0.3s;
+
+$easeOut-1: cubic-bezier(0.215, 0.61, 0.355, 1);
+$easeIn-1: cubic-bezier(0.645, 0.045, 0.355, 1);
