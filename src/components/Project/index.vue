@@ -23,6 +23,7 @@ defineOptions({
   padding: 32px;
 
   @media (max-width: $sm) {
+    gap: 16px;
     padding: 16px;
   }
 }

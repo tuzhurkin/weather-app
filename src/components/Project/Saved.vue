@@ -1,5 +1,6 @@
 <template>
-  <ProjectCards :cards="savedCards" />
+  <ProjectCards v-if="savedCards.length" :cards="savedCards" />
+  <ProjectEmpty v-else-if="!savedCards.length && !storedCardsLoading" />
   <div v-if="storedCardsLoading" class="loading">
     <BasePreloader />
   </div>
@@ -9,6 +10,7 @@
 import { storeToRefs } from 'pinia';
 import { useCardsStore } from '@/stores/CardsStore';
 import ProjectCards from '@/components/Project/Cards.vue';
+import ProjectEmpty from '@/components/Project/Empty.vue';
 import BasePreloader from '@/components/Base/Preloader.vue';
 
 defineOptions({

@@ -4,6 +4,7 @@
   "enter_city_name": "Enter city name",
   "24h": "24h",
   "5d": "5d",
+  "no_saved_cards_title": "There are no saved cards yet. \nGo to the main page, search for a city and click on the bookmark to save it.",
   "modal_active_cards_limit_title": "If you want to add more cards, you need to delete some of them because you have reached the limit of {{cards}} active cards.",
   "modal_saved_cards_limit_title": "If you want to add more cards, you need to delete some of them because you have reached the limit of {{cards}} saved cards.",
   "modal_already_added_title": "The card for {{name}} has already been added.",
