@@ -17,6 +17,7 @@ export const useCardsStore = defineStore('cards', () => {
   const activeCard = ref(null);
   const activeCards = ref([]);
   const savedCards = ref([]);
+  const storedCards = ref([]); // localStorage items: [{ id, name, lat, lon }]
 
   const loading = ref(false);
   const error = ref(null);
@@ -41,26 +42,43 @@ export const useCardsStore = defineStore('cards', () => {
     return data;
   };
 
+  const fetchAndBuildCard = async ({ name, lat, lon }) => {
+    const [weatherData, forecastData] = await Promise.all([
+      fetchWeatherData({ lat, lon }),
+      fetchForecastData({ lat, lon }),
+    ]);
+    const dayForecast = get24HoursForecast(forecastData);
+    const weekForecast = get5DayForecast(forecastData);
+    // use geo city name as weather API returns imprecise names
+    return buildCard({ ...weatherData, name }, lat, lon, dayForecast, weekForecast);
+  };
+
   const requestCityData = async () => {
-    const { name, lat, lon } = activeCity.value;
-    if (!name || !lat || !lon) return;
+    const city = activeCity.value;
+    if (!city?.name || !city?.lat || !city?.lon) return;
 
     loading.value = true;
     error.value = null;
     try {
-      const [weatherData, forecastData] = await Promise.all([
-        fetchWeatherData({ lat, lon }),
-        fetchForecastData({ lat, lon }),
-      ]);
-
-      const dayForecast = get24HoursForecast(forecastData);
-      const weekForecast = get5DayForecast(forecastData);
-
-      // use geo city name as weather API returns imprecise names
-      addCard({ ...weatherData, name }, dayForecast, weekForecast);
+      const card = await fetchAndBuildCard(city);
+      addCard(card);
     } catch (err) {
       error.value = err.message;
       console.error(err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const fetchStoredCards = async () => {
+    if (!storedCards.value.length) return;
+
+    loading.value = true;
+    try {
+      const cards = await Promise.all(storedCards.value.map(fetchAndBuildCard));
+      savedCards.value = cards;
+    } catch (err) {
+      console.error('Failed to fetch stored cards:', err);
     } finally {
       loading.value = false;
     }
@@ -116,7 +134,7 @@ export const useCardsStore = defineStore('cards', () => {
     await requestCityData();
   };
 
-  const buildCard = (card, dayForecast = [], weekForecast = []) => {
+  const buildCard = (card, lat, lon, dayForecast = [], weekForecast = []) => {
     return {
       id: card.id,
       city: card.name,
@@ -130,12 +148,14 @@ export const useCardsStore = defineStore('cards', () => {
       title: card.weather[0].main,
       description: card.weather[0].description,
       icon: card.weather[0].icon,
+      lat,
+      lon,
       dayForecast,
       weekForecast,
     };
   };
 
-  const addCard = (card, dayForecast = [], weekForecast = []) => {
+  const addCard = card => {
     if (isCardActive(card)) {
       setActiveCard(card);
       store.SHOW_Modal(ModalName.ALREADY_ADDED);
@@ -148,12 +168,12 @@ export const useCardsStore = defineStore('cards', () => {
       return;
     }
 
-    activeCards.value.unshift(buildCard(card, dayForecast, weekForecast));
+    activeCards.value.unshift(card);
   };
 
   // add to saved
   const saveCard = card => {
-    if (savedCards.value.length >= SAVED_CARDS_LIMIT) {
+    if (storedCards.value.length >= SAVED_CARDS_LIMIT) {
       setCurrentCardsLimitModal('saved');
       store.SHOW_Modal(ModalName.CARDS_LIMIT);
       return;
@@ -165,6 +185,7 @@ export const useCardsStore = defineStore('cards', () => {
       return;
     }
 
+    storedCards.value.unshift({ id: card.id, name: card.city, lat: card.lat, lon: card.lon });
     savedCards.value.unshift(card);
   };
 
@@ -172,6 +193,7 @@ export const useCardsStore = defineStore('cards', () => {
   const unsaveCard = card => {
     if (!isCardSaved(card)) return;
 
+    storedCards.value = storedCards.value.filter(c => c.id !== card.id);
     savedCards.value = savedCards.value.filter(c => c.id !== card.id);
   };
 
@@ -191,19 +213,20 @@ export const useCardsStore = defineStore('cards', () => {
   };
 
   const isCardSaved = card => {
-    return savedCards.value.some(c => c.id === card.id);
+    return storedCards.value.some(c => c.id === card.id);
   };
 
-  // initialize saved cards from localStorage
-  const savedCardsData = localStorage.getItem('savedCards');
-  if (savedCardsData) {
-    savedCards.value = JSON.parse(savedCardsData);
+  // initialize stored cards from localStorage and fetch fresh data
+  const storedCardsData = localStorage.getItem('storedCards');
+  if (storedCardsData) {
+    storedCards.value = JSON.parse(storedCardsData);
+    fetchStoredCards();
   }
 
   watch(
-    () => savedCards.value,
+    () => storedCards.value,
     newVal => {
-      localStorage.setItem('savedCards', JSON.stringify(newVal));
+      localStorage.setItem('storedCards', JSON.stringify(newVal));
     },
     { deep: true }
   );
@@ -216,13 +239,13 @@ export const useCardsStore = defineStore('cards', () => {
     activeCard,
     activeCards,
     savedCards,
+    storedCards,
     loading,
     error,
     setCurrentCardsLimitModal,
     setActiveCitySearchValue,
     setActiveCity,
     onSearch,
-    buildCard,
     addCard,
     saveCard,
     unsaveCard,

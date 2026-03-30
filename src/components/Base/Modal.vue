@@ -102,9 +102,9 @@ defineExpose({
 .modal-leave-to {
   opacity: 0;
 
-  @media (max-width: $sm) {
-    opacity: 1;
-  }
+  // @media (max-width: $sm) {
+  //   opacity: 1;
+  // }
 
   .modal-inner {
     transform: translate(0, 20px);

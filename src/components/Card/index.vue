@@ -1,8 +1,8 @@
 <template>
   <div class="card">
-    <div v-if="isMobile" class="cover cover--mobile"></div>
+    <div v-if="isMobile && revealing" class="cover cover--mobile"></div>
     <div class="top">
-      <div v-if="!isMobile" class="cover cover--top"></div>
+      <div v-if="!isMobile && revealing" class="cover cover--top"></div>
       <div class="info">
         <div class="location">
           <BaseIcon name="stats/point-low" />
@@ -17,12 +17,12 @@
       </div>
     </div>
     <div class="middle">
-      <div v-if="!isMobile" class="cover cover--middle"></div>
+      <div v-if="!isMobile && revealing" class="cover cover--middle"></div>
       <BaseIcon :name="icon" class="condition" />
       <div class="title">{{ card.title }}</div>
     </div>
     <div class="bottom">
-      <div v-if="!isMobile" class="cover cover--bottom"></div>
+      <div v-if="!isMobile && revealing" class="cover cover--bottom"></div>
       <div class="stats">
         <CardStat name="temp_max" :value="Math.round(card.temp_max) + '°C'" />
         <CardStat name="temp_min" :value="Math.round(card.temp_min) + '°C'" />
@@ -34,13 +34,13 @@
       <BaseButton
         type="icony"
         icon="bookmark"
-        :class="{ saved: isCardSaved }"
+        :class="{ saved: isCardSaved(card) }"
         @click="onSaveClick"
       />
       <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="onDeleteClick" />
     </div>
     <div class="chart">
-      <div v-if="!isMobile" class="cover cover--chart"></div>
+      <div v-if="!isMobile && revealing" class="cover cover--chart"></div>
       <CardForecast :forecast="card.dayForecast" />
       <!-- <CardForecast :forecast="card.weekForecast" /> -->
     </div>
@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { CONDITIONS } from '@/constants/conditions';
 import { storeToRefs } from 'pinia';
 import { ModalName } from '@/constants/modal';
@@ -72,8 +72,8 @@ const props = defineProps({
 
 const store = useLayoutStore();
 const cardsStore = useCardsStore();
-const { savedCards, isPageSaved } = storeToRefs(cardsStore);
-const { saveCard, unsaveCard, setActiveCard } = cardsStore;
+const { isPageSaved } = storeToRefs(cardsStore);
+const { saveCard, unsaveCard, setActiveCard, isCardSaved } = cardsStore;
 
 const isMobile = computed(() => store.IS_Mobile);
 
@@ -81,22 +81,28 @@ const icon = computed(() => {
   return `conditions/${CONDITIONS[props.card.icon]}`;
 });
 
-const isCardSaved = computed(() => {
-  return savedCards.value.some(c => c.id === props.card.id);
-});
-
 const onSaveClick = () => {
-  if (isCardSaved.value) {
-    unsaveCard(props.card);
-  } else {
-    saveCard(props.card);
-  }
+  isCardSaved(props.card) ? unsaveCard(props.card) : saveCard(props.card);
 };
 
 const onDeleteClick = () => {
   setActiveCard(props.card);
   store.SHOW_Modal(ModalName.DELETE_CONFIRM);
 };
+
+// reveal cover animation
+const revealing = ref(true);
+let cleanupTimer = null;
+
+onMounted(() => {
+  cleanupTimer = setTimeout(() => {
+    revealing.value = false;
+  }, 2000);
+});
+
+onBeforeUnmount(() => {
+  clearTimeout(cleanupTimer);
+});
 </script>
 
 <style scoped lang="scss">
