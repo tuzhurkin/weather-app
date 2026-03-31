@@ -36,6 +36,10 @@ const icon = computed(() => {
   align-items: center;
   gap: 12px;
 
+  @media (max-width: $sm) {
+    gap: 8px;
+  }
+
   .icon {
     width: 28px;
     height: 28px;
@@ -54,6 +58,7 @@ const icon = computed(() => {
 
     @media (max-width: $sm) {
       font-size: 24px;
+      line-height: 120%;
     }
   }
 }

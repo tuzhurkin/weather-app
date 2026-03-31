@@ -299,7 +299,7 @@ export const useCardsStore = defineStore('cards', () => {
       const updated = new Set(animatedCards.value);
       updated.delete(card.id);
       animatedCards.value = updated;
-    }, 2000);
+    }, 1500);
   };
 
   const isCardAnimated = card => {

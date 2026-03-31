@@ -1,8 +1,8 @@
 <template>
   <div ref="cardRef" class="card" :class="{ initial: card.isInitial }">
-    <div v-if="isMobile && revealing" class="cover cover--mobile"></div>
+    <div v-if="isTablet && revealing" class="cover cover--mobile"></div>
     <div class="top">
-      <div v-if="!isMobile && revealing" class="cover cover--top"></div>
+      <div v-if="!isTablet && revealing" class="cover cover--top"></div>
       <div class="info">
         <div class="location">
           <BaseIcon name="stats/point-low" />
@@ -18,12 +18,14 @@
       </div>
     </div>
     <div class="middle">
-      <div v-if="!isMobile && revealing" class="cover cover--middle"></div>
-      <BaseIcon :name="icon" class="condition" />
+      <div v-if="!isTablet && revealing" class="cover cover--middle"></div>
+      <div class="condition">
+        <BaseSvg :name="icon" />
+      </div>
       <div class="title">{{ localizedTitle }}</div>
     </div>
     <div class="bottom">
-      <div v-if="!isMobile && revealing" class="cover cover--bottom"></div>
+      <div v-if="!isTablet && revealing" class="cover cover--bottom"></div>
       <div class="stats">
         <CardStat name="temp_max" :value="Math.round(card.temp_max) + '°C'" />
         <CardStat name="temp_min" :value="Math.round(card.temp_min) + '°C'" />
@@ -40,13 +42,13 @@
       />
       <BaseButton v-if="!isPageSaved" type="icony" icon="trash" @click="onDeleteClick" />
     </div>
-    <div v-if="!isMobile && revealing" class="cover cover--chart"></div>
+    <div v-if="!isTablet && revealing" class="cover cover--chart"></div>
     <CardChartTabs :card="card" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed } from 'vue';
 import { CONDITIONS } from '@/constants/conditions';
 import { storeToRefs } from 'pinia';
 import { ModalName } from '@/constants/modal';
@@ -54,7 +56,9 @@ import { useLayoutStore } from '@/stores/LayoutStore';
 import { useCardsStore } from '@/stores/CardsStore';
 import { useLocale } from '@/composables/useLocale';
 import { useLocalTime } from '@/composables/useLocalTime';
+import { useCardReveal } from '@/composables/useCardReveal';
 import BaseIcon from '@/components/Base/Icon.vue';
+import BaseSvg from '@/components/Base/Svg.vue';
 import BaseButton from '@/components/Base/Button.vue';
 import CardStat from '@/components/Card/Stat.vue';
 import CardChartTabs from '@/components/Card/ChartTabs.vue';
@@ -73,11 +77,12 @@ const props = defineProps({
 const store = useLayoutStore();
 const cardsStore = useCardsStore();
 const { isPageSaved } = storeToRefs(cardsStore);
-const { saveCard, unsaveCard, setActiveCard, isCardSaved, isCardAnimated } = cardsStore;
+const { saveCard, unsaveCard, setActiveCard, isCardSaved } = cardsStore;
 const { locale } = useLocale();
 const { localTime } = useLocalTime(props.card.timezoneOffset);
+const { revealing } = useCardReveal(props.card);
 
-const isMobile = computed(() => store.IS_Mobile);
+const isTablet = computed(() => store.IS_Tablet);
 
 const isLocaleEn = computed(() => locale.value === 'en');
 const localizedCity = computed(() => props.card.local_names?.[locale.value] || props.card.city);
@@ -88,6 +93,8 @@ const localizedTitle = computed(() =>
 const icon = computed(() => {
   return `conditions/${CONDITIONS[props.card.icon]}`;
 });
+
+const cardRef = ref(null);
 
 const onSaveClick = () => {
   // isCardSaved(props.card) ? unsaveCard(props.card) : saveCard(props.card);
@@ -105,22 +112,6 @@ const onDeleteClick = () => {
   setActiveCard(props.card);
   store.SHOW_Modal(ModalName.DELETE_CONFIRM);
 };
-
-const cardRef = ref(null);
-
-// reveal cover animation
-const revealing = ref(isCardAnimated(props.card));
-let cleanupTimer = null;
-
-onMounted(() => {
-  cleanupTimer = setTimeout(() => {
-    revealing.value = false;
-  }, 2000);
-});
-
-onBeforeUnmount(() => {
-  clearTimeout(cleanupTimer);
-});
 </script>
 
 <style scoped lang="scss">
@@ -137,31 +128,32 @@ onBeforeUnmount(() => {
   border-radius: 50px;
   background: linear-gradient(150deg, $color-grey-600 0%, $color-grey-750 105%);
 
+  @media (max-width: $md) {
+    padding: 32px 50px;
+    border-radius: 36px;
+  }
+
   @media (max-width: $sm) {
     display: flex;
     flex-direction: column;
-    row-gap: 24px;
+    row-gap: 16px;
     padding: 24px 16px;
     border-radius: 24px;
   }
 
   .condition {
     position: relative;
-    width: 120px;
+    width: 180px;
     height: 120px;
 
-    @media (max-width: $sm) {
-      width: 150px;
-      height: 150px;
-    }
-
-    :deep(svg) {
+    :deep(.icon),
+    :deep(img) {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 150%;
-      height: 150%;
+      width: 180px;
+      height: 180px;
     }
   }
 
@@ -188,6 +180,11 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 12px;
 
+    @media (max-width: $sm) {
+      justify-content: center;
+      padding: 0 36px;
+    }
+
     :deep(.icon) {
       width: 28px;
       height: 28px;
@@ -208,6 +205,7 @@ onBeforeUnmount(() => {
 
     @media (max-width: $sm) {
       align-items: center;
+      gap: 16px;
     }
   }
 
@@ -215,9 +213,12 @@ onBeforeUnmount(() => {
     font-weight: 500;
     font-size: 88px;
     line-height: 100%;
+
+    @media (max-width: $sm) {
+      font-size: 72px;
+    }
   }
 
-  .feels-like,
   .local-time {
     display: flex;
     justify-content: center;
@@ -255,7 +256,7 @@ onBeforeUnmount(() => {
 
       @media (max-width: $sm) {
         align-items: center;
-        gap: 24px;
+        gap: 16px;
         width: 100%;
       }
     }
@@ -276,6 +277,10 @@ onBeforeUnmount(() => {
     justify-content: flex-end;
     padding-right: 16px;
 
+    @media (max-width: $md) {
+      padding-right: 36px;
+    }
+
     @media (max-width: $sm) {
       justify-content: center;
       padding-right: 0;
@@ -294,7 +299,7 @@ onBeforeUnmount(() => {
         column-gap: 8px;
         width: 100%;
         padding: 0;
-        margin-top: 16px;
+        margin-top: 8px;
       }
 
       .stat {
@@ -335,9 +340,10 @@ onBeforeUnmount(() => {
 
     @media (max-width: $sm) {
       justify-content: flex-start;
-      gap: 24px;
-      top: 16px;
+      gap: 36px;
+      top: 24px;
       right: 16px;
+      padding: 0;
 
       opacity: 1;
       pointer-events: auto;
@@ -357,6 +363,14 @@ onBeforeUnmount(() => {
             path[fill] {
               fill: $color-green;
             }
+            @include hover {
+              path[stroke] {
+                stroke: $color-green;
+              }
+              path[fill] {
+                fill: $color-green;
+              }
+            }
           }
         }
       }
@@ -368,10 +382,10 @@ onBeforeUnmount(() => {
         &.bookmark {
           @include hover {
             path[stroke] {
-              stroke: $color-green;
+              stroke: $color-green-hover;
             }
             path[fill] {
-              fill: $color-green;
+              fill: $color-green-hover;
             }
           }
         }
@@ -391,6 +405,13 @@ onBeforeUnmount(() => {
   }
 
   @include hover {
+    .controls {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  @media (hover: none) {
     .controls {
       opacity: 1;
       pointer-events: auto;
