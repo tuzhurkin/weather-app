@@ -1,11 +1,19 @@
 <template>
-  <TransitionGroup tag="div" class="project-cards" name="card" @before-leave="onCardBeforeLeave">
+  <TransitionGroup
+    tag="div"
+    class="project-cards"
+    name="card"
+    @before-leave="onBeforeLeave"
+    @leave="onLeave"
+    @after-leave="onAfterLeave"
+  >
     <Card class="project-card" v-for="card in cards" :key="card.id" :card="card" />
   </TransitionGroup>
 </template>
 
 <script setup>
 import Card from '@/components/Card/index.vue';
+import { useCardsAnimation } from '@/composables/useCardsAnimation';
 
 defineOptions({
   name: 'ProjectCards',
@@ -18,26 +26,17 @@ defineProps({
   },
 });
 
-const onCardBeforeLeave = el => {
-  const parent = el.parentElement;
-  if (!parent) return;
-
-  const parentRect = parent.getBoundingClientRect();
-  const rect = el.getBoundingClientRect();
-
-  el.style.position = 'absolute';
-  el.style.top = `${rect.top - parentRect.top + parent.scrollTop}px`;
-  el.style.left = `${rect.left - parentRect.left + parent.scrollLeft}px`;
-  el.style.width = `${rect.width}px`;
-};
+const { onBeforeLeave, onLeave, onAfterLeave } = useCardsAnimation();
 </script>
 
 <style scoped lang="scss">
-.card-enter-active,
-.card-leave-active {
+$enter-duration: 0.5s;
+$leave-duration: 0.15s;
+
+.card-enter-active {
   transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
+    opacity $enter-duration ease,
+    transform $enter-duration ease;
 }
 
 .card-enter-from {
@@ -52,6 +51,9 @@ const onCardBeforeLeave = el => {
 
 .card-leave-active {
   position: absolute;
+  transition:
+    opacity $leave-duration ease,
+    transform $leave-duration ease;
 }
 
 .card-leave-from {
@@ -61,11 +63,11 @@ const onCardBeforeLeave = el => {
 
 .card-leave-to {
   opacity: 0;
-  transform: translateY(-32px);
+  transform: translateY(32px);
 }
 
 .card-move {
-  transition: transform 0.5s ease;
+  transition: transform $enter-duration ease;
 }
 
 .project-cards {

@@ -1,5 +1,5 @@
 <template>
-  <div class="card" :class="{ initial: card.isInitial }">
+  <div ref="cardRef" class="card" :class="{ initial: card.isInitial }">
     <div v-if="isMobile && revealing" class="cover cover--mobile"></div>
     <div class="top">
       <div v-if="!isMobile && revealing" class="cover cover--top"></div>
@@ -53,6 +53,7 @@ import { ModalName } from '@/constants/modal';
 import { useLayoutStore } from '@/stores/LayoutStore';
 import { useCardsStore } from '@/stores/CardsStore';
 import { useLocale } from '@/composables/useLocale';
+import { useLocalTime } from '@/composables/useLocalTime';
 import BaseIcon from '@/components/Base/Icon.vue';
 import BaseButton from '@/components/Base/Button.vue';
 import CardStat from '@/components/Card/Stat.vue';
@@ -72,8 +73,9 @@ const props = defineProps({
 const store = useLayoutStore();
 const cardsStore = useCardsStore();
 const { isPageSaved } = storeToRefs(cardsStore);
-const { saveCard, unsaveCard, setActiveCard, isCardSaved } = cardsStore;
+const { saveCard, unsaveCard, setActiveCard, isCardSaved, isCardAnimated } = cardsStore;
 const { locale } = useLocale();
+const { localTime } = useLocalTime(props.card.timezoneOffset);
 
 const isMobile = computed(() => store.IS_Mobile);
 
@@ -88,7 +90,15 @@ const icon = computed(() => {
 });
 
 const onSaveClick = () => {
-  isCardSaved(props.card) ? unsaveCard(props.card) : saveCard(props.card);
+  // isCardSaved(props.card) ? unsaveCard(props.card) : saveCard(props.card);
+
+  if (isCardSaved(props.card)) {
+    const elHeight = cardRef.value?.getBoundingClientRect()?.height;
+    setActiveCard({ ...props.card, elHeight });
+    unsaveCard(props.card);
+  } else {
+    saveCard(props.card);
+  }
 };
 
 const onDeleteClick = () => {
@@ -96,36 +106,19 @@ const onDeleteClick = () => {
   store.SHOW_Modal(ModalName.DELETE_CONFIRM);
 };
 
-// local time clock
-const localTime = ref('');
-let clockTimer = null;
-
-const updateLocalTime = () => {
-  const offset = props.card.timezoneOffset ?? 0;
-  const d = new Date((Date.now() / 1000 + offset) * 1000);
-  const hh = String(d.getUTCHours()).padStart(2, '0');
-  const mm = String(d.getUTCMinutes()).padStart(2, '0');
-  const dd = String(d.getUTCDate()).padStart(2, '0');
-  const mo = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const yyyy = d.getUTCFullYear();
-  localTime.value = `${hh}:${mm} ${dd}/${mo}/${yyyy}`;
-};
+const cardRef = ref(null);
 
 // reveal cover animation
-const revealing = ref(true);
+const revealing = ref(isCardAnimated(props.card));
 let cleanupTimer = null;
 
 onMounted(() => {
-  updateLocalTime();
-  clockTimer = setInterval(updateLocalTime, 10000);
-
   cleanupTimer = setTimeout(() => {
     revealing.value = false;
   }, 2000);
 });
 
 onBeforeUnmount(() => {
-  clearInterval(clockTimer);
   clearTimeout(cleanupTimer);
 });
 </script>

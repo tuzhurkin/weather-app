@@ -198,7 +198,7 @@ defineExpose({
 
 .modal-primary {
   :deep(.modal-inner) {
-    max-width: 32%;
+    max-width: 550px;
     padding: 32px;
 
     @media (max-width: $sm) {

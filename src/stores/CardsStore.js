@@ -233,6 +233,8 @@ export const useCardsStore = defineStore('cards', () => {
     }
 
     activeCards.value.unshift(card);
+
+    triggerCardAnimation(card);
   };
 
   // add to saved
@@ -286,6 +288,24 @@ export const useCardsStore = defineStore('cards', () => {
     return storedCards.value.some(c => c.id === card.id);
   };
 
+  // trigger card animation once logic
+  const animatedCards = ref(new Set());
+
+  const triggerCardAnimation = card => {
+    const newSet = new Set(animatedCards.value);
+    newSet.add(card.id);
+    animatedCards.value = newSet;
+    setTimeout(() => {
+      const updated = new Set(animatedCards.value);
+      updated.delete(card.id);
+      animatedCards.value = updated;
+    }, 2000);
+  };
+
+  const isCardAnimated = card => {
+    return animatedCards.value.has(card.id);
+  };
+
   // set the first displayed card based on user ip
   setInitialCard();
 
@@ -327,5 +347,6 @@ export const useCardsStore = defineStore('cards', () => {
     setActiveCard,
     isCardActive,
     isCardSaved,
+    isCardAnimated,
   };
 });
