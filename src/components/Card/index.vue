@@ -5,7 +5,8 @@
       <div v-if="!isTablet && revealing" class="cover cover--top"></div>
       <div class="info">
         <div class="location">
-          <BaseIcon name="stats/point-low" />
+          <!-- <BaseIcon name="stats/point-low" /> -->
+          <CardFlag :name="card.country" />
           <span class="name">{{ localizedCity }}, {{ card.country }}</span>
         </div>
         <div class="temp-wrap">
@@ -60,6 +61,7 @@ import { useCardReveal } from '@/composables/useCardReveal';
 import BaseIcon from '@/components/Base/Icon.vue';
 import BaseSvg from '@/components/Base/Svg.vue';
 import BaseButton from '@/components/Base/Button.vue';
+import CardFlag from '@/components/Card/Flag.vue';
 import CardStat from '@/components/Card/Stat.vue';
 import CardChartTabs from '@/components/Card/ChartTabs.vue';
 
